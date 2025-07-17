@@ -1,0 +1,56 @@
+﻿<Window x:Class="Tasky.Views.Utils.AddModal"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:Tasky.Views.Utils"
+      mc:Ignorable="d" 
+      WindowStartupLocation="CenterOwner"
+      Title="AddModal" Height="400" Width="800">
+
+    <Grid Style="{StaticResource Modal Style}">
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200"/>
+            <ColumnDefinition Width="200"/>
+            <ColumnDefinition Width="200"/>
+            <ColumnDefinition Width="200"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="100"/>
+            <RowDefinition Height="110"/>
+            <RowDefinition Height="190"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Text="Preencha as informações abaixo e salve" HorizontalAlignment="Center" FontWeight="Bold"
+                   FontSize="20" Margin="15,0,0,0" Foreground="White"
+                   Height="35"/>
+
+        <StackPanel Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" >
+            <TextBlock Text="Nome da tarefa:" FontWeight="Bold" Margin="5,5,0,0"      FontSize="16" Foreground="White"/>
+            <TextBlock Text="Descrição da tarefa:" FontWeight="Bold" Margin="5,5,0,0" FontSize="16" Foreground="White"/>
+            <TextBlock Text="Data:" FontWeight="Bold" Margin="5,5,0,0"                FontSize="16" Foreground="White"/>
+            <TextBlock Text="Notificar:" FontWeight="Bold" Margin="5,0,0,0"           FontSize="16" Foreground="White"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="1">
+            <TextBox x:Name="taskName" Margin="5,8,0,0" />
+            <TextBox x:Name="taskDesc" Margin="5,8,0,0" />
+            <TextBox x:Name="fazerSelect" Margin="5,8,0,0" /> <!-- Alterar para select menu -->
+            <CheckBox x:Name="taskNot" Margin="5,8,0,0" />
+        </StackPanel>
+
+        <Button Width="20" Height="20" Background="Red" Click="CloseModal" >
+            <!--Mouse down não está funcionando-->
+            <Button.Content>
+                <TextBlock Text="X"/>
+            </Button.Content>
+        </Button>
+
+        <Button Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" Height="50" Margin="0,0,0,60" Content="Enviar" FontSize="18" FontWeight="Bold" Background="DarkOliveGreen" Click="SubmitInfo"/>
+
+
+
+    </Grid>
+</Window>

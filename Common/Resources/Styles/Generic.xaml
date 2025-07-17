@@ -1,0 +1,111 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Style x:Key="HomePageStyle" TargetType="Grid">
+        <Setter Property="Background" Value="#00071d"/>
+    </Style>
+
+    <Style x:Key="Modal Style" TargetType="Grid">
+        <Setter Property="Background" Value="#141F4A"/>
+    </Style>
+
+    <Style x:Key="ListPage" TargetType="ListView">
+        <Setter Property="Background" Value="#1a2238"/>
+    </Style>
+
+
+    <!--Template serve para redefinir valores que propriedades no wpf já tem por padrão,
+        usamos control template para manipular pois não se trata de apenas UM valor.
+    
+            snaps to device - deixa mais nítido
+        
+    
+    
+    
+    
+    
+    -->
+
+    <Style x:Key="StandardActionBtn" TargetType="Button">
+        <Setter Property="Background" Value="#214281"/>
+        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="BorderBrush" Value="Black"/>
+        <Setter Property="BorderThickness" Value="1"/>
+
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" x:Name="borderZoom"
+                        RenderTransformOrigin="0.5,0.5"
+                        CornerRadius="4"
+                        Padding="8"
+                        SnapsToDevicePixels="True">
+                        <Border.RenderTransform>
+                            <ScaleTransform ScaleX="1" ScaleY="1"/>
+                        </Border.RenderTransform>
+                        <ContentPresenter HorizontalAlignment="Center"
+                                      VerticalAlignment="Center"
+                                      RecognizesAccessKey="True"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Trigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation From="1.0" To="1.05" Duration="0:0:0.1" Storyboard.TargetName="borderZoom" 
+                                            Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"/>
+
+                                        <DoubleAnimation From="1.0" To="1.05" Duration="0:0:0.1" Storyboard.TargetName="borderZoom"
+                                            Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"/>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.EnterActions>
+
+                            <Trigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation From="1.05" To="1.0" Duration="0:0:0.1" Storyboard.TargetName="borderZoom" Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"/>
+                                        <DoubleAnimation From="1.05" To="1.0" Duration="0:0:0.1" Storyboard.TargetName="borderZoom" Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"/>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.ExitActions>
+
+                        </Trigger>
+
+
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+
+
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+
+
+
+
+    <BitmapImage x:Key="CloseButton" UriSource="C:\Users\Pichau\source\repos\Tasky\Common\Resources\Images\CloseButton.png" 
+                 RenderOptions.BitmapScalingMode="HighQuality"/>
+
+    <BitmapImage x:Key="AddButton" UriSource="C:\Users\Pichau\source\repos\Tasky\Common\Resources\Images\AddButton.png" 
+                 RenderOptions.BitmapScalingMode="HighQuality"/>
+
+    <BitmapImage x:Key="EditButton" UriSource="C:\Users\Pichau\source\repos\Tasky\Common\Resources\Images\EditButton.png" 
+                 RenderOptions.BitmapScalingMode="HighQuality"/>
+
+    <BitmapImage x:Key="DeleteButton" UriSource="C:\Users\Pichau\source\repos\Tasky\Common\Resources\Images\DeleteButton.png" 
+                 RenderOptions.BitmapScalingMode="HighQuality"/>
+
+
+
+
+
+
+
+
+
+
+
+
+</ResourceDictionary>
