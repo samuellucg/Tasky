@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:Tasky.Views"
         xmlns:conv="clr-namespace:Tasky.Common.Converters"
     mc:Ignorable="d"
+        ResizeMode="NoResize"
         Title="TasksHomePage" Height="700" Width="900">
 
     <Window.Resources>
@@ -53,11 +54,11 @@
 
                                 </Canvas>
 
-                                <Canvas Visibility="{Binding IsEditingTask,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ShowEditingList}}">
+                                <Canvas Visibility="{Binding IsEditingTask,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ShowEditingList}}" x:Name="LISTEDIT">
                                     <TextBlock Padding="5,6,0,0" FontWeight="Bold" Foreground="AntiqueWhite" FontSize="15" Text="Name:"/>
-                                    <TextBox Width="120" Canvas.Left="60" Canvas.Bottom="-25" Text="{Binding Path=TaskName}"/>
-                                    <TextBlock Padding="5,29,0,0" FontWeight="Bold" FontSize="15" Foreground="AntiqueWhite"  Text="Descrição:"/>
-                                    <TextBox Width="120" Canvas.Left="85" Canvas.Bottom="-50" Text="{Binding Path=TaskDesc}"/>
+                                    <TextBox Width="120" Canvas.Left="60" Canvas.Bottom="-25" Text="{Binding Path=TaskName, UpdateSourceTrigger=Explicit}" x:Name="NameToSave"/>
+                                    <TextBlock Padding="5,29,0,0" FontWeight="Bold" FontSize="15" Foreground="AntiqueWhite"  Text="Descrição:" />
+                                    <TextBox Width="120" Canvas.Left="85" Canvas.Bottom="-50" Text="{Binding Path=TaskDesc, UpdateSourceTrigger=Explicit}" x:Name="DescToSave"/>
                                     <Button Content="Salvar" Click="SaveChanges" Canvas.Bottom="-75" Canvas.Left="5" BorderThickness="2" Width="80"/>
                                     <Button Background="Red" Content="Cancelar" Click="EditTask" Canvas.Bottom="-75" Canvas.Left="90" BorderThickness="2" Width="80"/>
                                 </Canvas>

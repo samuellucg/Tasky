@@ -20,13 +20,15 @@
         
      
         <TextBlock Text="ATENÇÃO!" Margin="8,6,0,0"
-        FontWeight="Bold" FontSize="12" Grid.Row="0" Foreground="White"/>
+        FontWeight="Bold" FontSize="12" Grid.Row="0" Foreground="White" x:Name="attentionName"/>
 
         <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center"
             x:Name="ConfirmationToUser" FontWeight="Bold" Grid.Row="1" Foreground="White"/>
         <!--Text="Your message here"-->
 
-        <Button Width="70" Height="20" Background="Green" Content="Sim" VerticalAlignment="Bottom" Grid.Row="2" Margin="0,0,85,0" Click="SubmitConfirmation"/>
-        <Button Width="70" Height="20" Background="Red" Content="Não" VerticalAlignment="Bottom" Grid.Row="2" Margin="75,0,0,0" Click="UndoConfirmation"/>
+        <Button Width="70" Height="20" Background="Green" Content="Sim" VerticalAlignment="Bottom" Grid.Row="2" Margin="0,0,85,0" Click="SubmitConfirmation" x:Name="submitButton">
+        </Button>
+
+        <Button Width="70" Height="20" Background="Red" Content="Não" VerticalAlignment="Bottom" Grid.Row="2" Margin="75,0,0,0" Click="UndoConfirmation" x:Name="cancelButton"/>
     </Grid>
 </Window>

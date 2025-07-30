@@ -34,15 +34,16 @@ namespace Tasky.Views
             _vm = vm;
         }
 
-        public void AddTask(object sender, RoutedEventArgs e) 
+        public void AddTask(object sender, RoutedEventArgs e)
         {
             var modal = new AddModal(_vm);
-            modal.ShowDialog();
+            modal.ShowDialog(); 
         }
 
         public void EditTask(object sender, RoutedEventArgs e)
         {
             var previewTask = (sender as Button).DataContext as Models.Task;
+            //var testTask = (sender as TextBox).Text;
 
             if (_selectedTaskName == null && _selectedTaskDesc == null)
             {
@@ -50,16 +51,27 @@ namespace Tasky.Views
                 _selectedTaskDesc = previewTask.TaskDesc;
             }
 
+            //if (_selectedTaskName != null && _selectedTaskDesc != null)
+            //{
+            //    previewTask.TaskName = _selectedTaskName;
+            //    previewTask.TaskDesc = _selectedTaskDesc;
+            //}
+
             if (!previewTask.IsEditingTask)
             {
                 previewTask.IsEditingTask = true;
+                previewTask.CanChange = false;
             }
 
             else if (previewTask.IsEditingTask)
             {
+                previewTask.CanChange = true;
                 previewTask.IsEditingTask = false;
                 _selectedTaskName = null;
                 _selectedTaskDesc = null;
+
+                ReloadEditList(sender);
+
             }
 
             else
@@ -72,19 +84,67 @@ namespace Tasky.Views
             }
         }
 
+        private void ReloadEditList(object sender)
+        {
+            DependencyObject test = (sender as Button).Parent;
+
+            if (test is Canvas canvas)
+            {
+                foreach (var child in LogicalTreeHelper.GetChildren(canvas))
+                {
+                    if (child is TextBox tb)
+                    {
+                        tb.GetBindingExpression(TextBox.TextProperty).UpdateTarget(); // Quando o update source trigger é explicit. Precisamos "puxar" as informações dessa forma para isso o update target. No caso o reload
+                    }
+                }
+            }
+        }
+
         public void SaveChanges(object sender, RoutedEventArgs e)
         {
             var newTask = (sender as Button).DataContext as Models.Task;
+            newTask.CanChange = true;
+            var test = (sender as Button).Parent;
+            DependencyObject parent = test;
+
+            if (parent is Canvas canvas)
+            {
+                foreach (var child in LogicalTreeHelper.GetChildren(canvas))
+                {
+                    if (child is TextBox tb)
+                    {
+                        if (tb.Name == "NameToSave")
+                        {
+                            newTask.TaskName = tb.Text;
+                        }
+                        if (tb.Name == "DescToSave")
+                        {
+                            newTask.TaskDesc = tb.Text;
+                        }
+
+                        tb.GetBindingExpression(TextBox.TextProperty).UpdateSource(); // Quando o update source trigger é explicit. Precisamos atualizar dessa forma para isso o update source.
+                    }
+                }
+            }
+
+            newTask.CanChange = false;
+
+
 
             if (newTask.TaskName != _selectedTaskName || newTask.TaskDesc != _selectedTaskDesc)
             {
+                //newTask.CanChange = true;
                 _vm.DB.UpdateTask(_selectedTaskDesc, _selectedTaskName, newTask.TaskDesc, newTask.TaskName);
-                MessageBox.Show("Edições salvas"); // Mudar isso para um modal criado por você.
+                //MessageBox.Show("Edições salvas"); // Mudar isso para um modal criado por você.
+                MessageConfirmation message = new MessageConfirmation("Edições salvas", false);
+                message.ShowDialog();
                 EditTask(sender, e);
             }
             else if (newTask.TaskName == _selectedTaskName && newTask.TaskDesc == _selectedTaskDesc)
             {
-                MessageBox.Show("Elas são as mesmas, não há porque salvar"); // Mudar isso para um modal criado por você.
+                MessageConfirmation message = new MessageConfirmation("Elas são as mesmas, não há porque salvar", false);
+                message.ShowDialog();
+                //MessageBox.Show("Elas são as mesmas, não há porque salvar"); // Mudar isso para um modal criado por você.
             }
             else
             {
@@ -105,11 +165,16 @@ namespace Tasky.Views
                 {
                     var newTasks = _vm.DB.DeleteTask(taskToDelete);
                     _vm.TasksToShow = newTasks;
-                    MessageBox.Show("Tarefa deletada"); // Mudar isso para um modal criado por você.
+                    //MessageBox.Show("Tarefa deletada"); // Mudar isso para um modal criado por você.
+                    MessageConfirmation message = new MessageConfirmation("Tarefa deletada", false);
+                    message.ShowDialog();
+
                 }
                 else
                 {
-                    MessageBox.Show("Operação cancelada"); // Mudar isso para um modal criado por você.
+                    //MessageBox.Show("Operação cancelada"); // Mudar isso para um modal criado por você.
+                    MessageConfirmation message = new MessageConfirmation("Operação cancelada", false);
+                    message.ShowDialog();
                 }
             }
             else

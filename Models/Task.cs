@@ -22,7 +22,7 @@ namespace Tasky.Models
             }
             set
             {
-                if (_taskName != value)
+                if (_taskName != value && _canChange)
                 {
                     _taskName = value;
                     OnPropertyChanged("TaskName");
@@ -58,7 +58,7 @@ namespace Tasky.Models
             }
             set
             {
-                if (_taskDesc != value)
+                if (_taskDesc != value && _canChange)
                 {
                     _taskDesc = value;
                     OnPropertyChanged("TaskDesc");
@@ -97,6 +97,20 @@ namespace Tasky.Models
                 {
                     _isEditingTask = value;
                     OnPropertyChanged("IsEditingTask");
+                }
+            }
+        }
+
+        private bool _canChange = true;
+
+        public bool CanChange
+        {
+            get => _canChange;
+            set
+            {
+                if (_canChange != value)
+                {
+                    _canChange = value;
                 }
             }
         }

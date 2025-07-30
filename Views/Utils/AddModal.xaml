@@ -41,14 +41,14 @@
             <CheckBox x:Name="taskNot" Margin="5,8,0,0" />
         </StackPanel>
 
-        <Button Width="20" Height="20" Background="Red" Click="CloseModal" >
+        <Button Width="20" Height="20" Background="Red" Click="CloseModal">
             <!--Mouse down não está funcionando-->
             <Button.Content>
                 <TextBlock Text="X"/>
             </Button.Content>
         </Button>
 
-        <Button Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" Height="50" Margin="0,0,0,60" Content="Enviar" FontSize="18" FontWeight="Bold" Background="DarkOliveGreen" Click="SubmitInfo"/>
+        <Button Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" Height="50" Margin="0,0,0,60" Content="Enviar" FontSize="18" FontWeight="Bold" Background="DarkOliveGreen" Click="SubmitInfo" Style="{StaticResource StandardActionBtn}"  />
 
 
 

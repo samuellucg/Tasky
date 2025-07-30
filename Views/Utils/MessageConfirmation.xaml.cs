@@ -21,11 +21,15 @@ namespace Tasky.Views.Utils
     {
         public bool UserResponse { get; private set; }
 
-        public MessageConfirmation(string confirmationText)
+        public MessageConfirmation(string confirmationText, bool showAttention = true)
         {
             this.Owner = Application.Current.MainWindow;
             InitializeComponent();
             ConfirmationToUser.Text = confirmationText;
+            attentionName.Visibility = showAttention == true ? Visibility.Visible : Visibility.Collapsed;
+            submitButton.Visibility = showAttention == true ? Visibility.Visible : Visibility.Collapsed;
+            cancelButton.Visibility = showAttention == true ? Visibility.Visible : Visibility.Collapsed;
+
         }
 
         private void SubmitConfirmation(object sender, RoutedEventArgs e)
