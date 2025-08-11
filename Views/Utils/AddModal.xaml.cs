@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -36,42 +37,61 @@ namespace Tasky.Views.Utils
 
         private void SubmitInfo(object sender, RoutedEventArgs e)
         {
-            if (taskName.Text.Length > 1 && taskDesc.Text.Length > 1)
+            try
             {
-                var taskCreated = new Models.Task(taskName.Text, taskNot.IsChecked.Value, taskDesc.Text, TimeSpan.Zero);
-                if (taskCreated != null)
+                var validDate = DateTime.Parse(taskDate.Text);
+                //var actualYear = DateTime.Now.Year;
+                var actualDate = DateTime.Now;
+                if (taskName.Text.Length > 1 && taskDesc.Text.Length > 1 && validDate.Year >= actualDate.Year && validDate.Month >= actualDate.Month && validDate.Day >= actualDate.Day)
                 {
-                    MessageConfirmation userInput = new MessageConfirmation("Tem certeza que deseja prosseguir?");
-                    bool? hasShowed = userInput.ShowDialog();
-                    if (hasShowed is true)
+                    var taskCreated = new Models.Task(taskName.Text, taskNot.IsChecked.Value, taskDesc.Text, validDate); // fazer campo pra mandar data.
+                    if (taskCreated != null)
                     {
-                        bool userChoice = userInput.UserResponse;
-
-                        if (userChoice)
+                        MessageConfirmation userInput = new MessageConfirmation("Tem certeza que deseja prosseguir?");
+                        bool? hasShowed = userInput.ShowDialog();
+                        if (hasShowed is true)
                         {
-                            using (Tasky.Database.Database DB = new Tasky.Database.Database())
+                            bool userChoice = userInput.UserResponse;
+
+                            if (userChoice)
                             {
-                                DB.CreateTask(taskCreated);
-                                _viewModel.TasksToShow = DB.GetAllTasks();
-                            }
-                            taskName.Text = taskDesc.Text = null;
-                            taskNot.IsChecked = false;
+                                using (Tasky.Database.Database DB = new Tasky.Database.Database())
+                                {
+                                    DB.CreateTask(taskCreated);
+                                    _viewModel.TasksToShow = DB.GetAllTasks();
+                                }
+                                taskName.Text = taskDesc.Text = null;
+                                taskNot.IsChecked = false;
 
-                            new MessageWarning("Operação realizada");
-                            Close();
-                        }
-                        else
-                        {
-                            new MessageWarning("Operação abortada");
-                            Close();
+                                new MessageWarning("Operação realizada");
+                                Close();
+                            }
+                            else
+                            {
+                                new MessageWarning("Operação abortada");
+                                //Close();
+                            }
                         }
                     }
                 }
+
+                else if (validDate.Year < actualDate.Year || validDate.Month < actualDate.Month || validDate.Day < actualDate.Day)
+                {
+                    //new MessageWarning(string.Format("Deve ser salvo para anos\nentre {0} ou mais.", actualDate.Year.ToString()));
+                    new MessageWarning(string.Format("A data deve ser posterior a\n              {0}/{1}/{2}", actualDate.Day.ToString(),actualDate.Month.ToString(),actualDate.Year.ToString()));
+                }
+
+                else
+                {
+                    new MessageWarning("Erro ao salvar");
+                    Close();
+                }
             }
-            else
+            catch (System.FormatException)
             {
-                new MessageWarning("Erro ao salvar");
-            }
+                new MessageWarning("Data inválida, insira novamente.");
+                //Close();
+            }            
 
         }
 

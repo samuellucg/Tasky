@@ -26,6 +26,7 @@ namespace Tasky.Views
 
         private string _selectedTaskName;
         private string _selectedTaskDesc;
+        private DateTime _selectedTaskDate;
 
         public TasksHomePage(MainViewModel vm)
         {
@@ -49,6 +50,7 @@ namespace Tasky.Views
             {
                 _selectedTaskName = previewTask.TaskName;
                 _selectedTaskDesc = previewTask.TaskDesc;
+                _selectedTaskDate = previewTask.HourTask;
             }
 
             //if (_selectedTaskName != null && _selectedTaskDesc != null)
@@ -69,6 +71,7 @@ namespace Tasky.Views
                 previewTask.IsEditingTask = false;
                 _selectedTaskName = null;
                 _selectedTaskDesc = null;
+                //_selectedTaskDate = DateTime.;
 
                 ReloadEditList(sender);
 
@@ -121,6 +124,10 @@ namespace Tasky.Views
                         {
                             newTask.TaskDesc = tb.Text;
                         }
+                        if(tb.Name == "DateToSave")
+                        {
+                            newTask.HourTask = DateTime.Parse(tb.Text);
+                        }
 
                         tb.GetBindingExpression(TextBox.TextProperty).UpdateSource(); // Quando o update source trigger é explicit. Precisamos atualizar dessa forma para isso o update source.
                     }
@@ -131,16 +138,16 @@ namespace Tasky.Views
 
 
 
-            if (newTask.TaskName != _selectedTaskName || newTask.TaskDesc != _selectedTaskDesc)
+            if (newTask.TaskName != _selectedTaskName || newTask.TaskDesc != _selectedTaskDesc || newTask.HourTask != _selectedTaskDate)
             {
                 //newTask.CanChange = true;
-                _vm.DB.UpdateTask(_selectedTaskDesc, _selectedTaskName, newTask.TaskDesc, newTask.TaskName);
+                _vm.DB.UpdateTask(_selectedTaskDesc, _selectedTaskName, newTask.TaskDesc, newTask.TaskName, newTask.HourTask,_selectedTaskDate);
                 //MessageBox.Show("Edições salvas"); // Mudar isso para um modal criado por você.
                 MessageConfirmation message = new MessageConfirmation("Edições salvas", false);
                 message.ShowDialog();
                 EditTask(sender, e);
             }
-            else if (newTask.TaskName == _selectedTaskName && newTask.TaskDesc == _selectedTaskDesc)
+            else if (newTask.TaskName == _selectedTaskName && newTask.TaskDesc == _selectedTaskDesc && newTask.HourTask == _selectedTaskDate)
             {
                 MessageConfirmation message = new MessageConfirmation("Elas são as mesmas, não há porque salvar", false);
                 message.ShowDialog();

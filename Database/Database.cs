@@ -40,7 +40,8 @@ namespace Tasky.Database
         {
             if (File.Exists(fileName) && File.ReadAllLines(fileName).Length <= 2)
             {
-                Models.Task toCreate = new Models.Task("Estudar", false, "Estudar programação", TimeSpan.FromDays(5));
+                //DateTime data = string.Format("{0}/{1}/{2}", DateTime.Now.Day, DateTime.Now.Month, DateTime.Now.Year);
+                Models.Task toCreate = new Models.Task("Estudar", false, "Estudar programação", DateTime.Now.Date);
                 CreateTask(toCreate);
             }
         }
@@ -65,15 +66,16 @@ namespace Tasky.Database
             GetAllTasks();
         }
 
-        public void UpdateTask(string oldDesc, string oldName, string newDesc, string newName)
+        public void UpdateTask(string oldDesc, string oldName, string newDesc, string newName, DateTime newDate, DateTime oldDate)
         {
             var tasks = GetAllTasks();
 
-            var xt = tasks.FirstOrDefault(x => x.TaskName == oldName && x.TaskDesc == oldDesc);
+            var xt = tasks.FirstOrDefault(x => x.TaskName == oldName && x.TaskDesc == oldDesc && x.HourTask == oldDate);
             if (xt != null)
             {
                 xt.TaskName = newName;
                 xt.TaskDesc = newDesc;
+                xt.HourTask = newDate;
                 File.WriteAllText(fileName, JsonConvert.SerializeObject(tasks,Formatting.Indented));
             }
             else

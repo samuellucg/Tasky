@@ -3,8 +3,9 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:local="clr-namespace:Tasky.Views"
-        xmlns:conv="clr-namespace:Tasky.Common.Converters"
+        xmlns:conv="clr-namespace:Tasky.Common.Converters"        
     mc:Ignorable="d"
         ResizeMode="NoResize"
         Title="TasksHomePage" Height="700" Width="900">
@@ -38,11 +39,13 @@
                             <StackPanel>
                                 <Canvas Visibility="{Binding IsEditingTask,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ShowList}}">
                                     <TextBlock Padding="5,3,0,0" HorizontalAlignment="Left" FontWeight="Bold" Foreground="AntiqueWhite" FontSize="15" Text="{Binding Path=TaskName}" x:Name="nameDisplay"/>
-                                    <TextBlock HorizontalAlignment="Left" FontWeight="Bold" FontSize="15" Padding="5,25,0,0" Foreground="AntiqueWhite" Text="{Binding Path=TaskDesc}" x:Name="descDisplay"/>
-                                    <CheckBox  Canvas.Left="5" Canvas.Bottom="-62"/>
+                                    <TextBlock HorizontalAlignment="Left" FontWeight="Bold" FontSize="15" Padding="5,23,0,0" Foreground="AntiqueWhite" Text="{Binding Path=TaskDesc}" x:Name="descDisplay"/>
+                                    <xctk:MaskedTextBox Width="70" Canvas.Bottom="-65" Canvas.Left="5" Height="20" Watermark="__/__/____" Mask="00/00/0000" PromptChar="_" Text="{Binding Path=HourTask, StringFormat='dd/MM/yyyy'}" IsEnabled="False"/> 
+                                    <!--Adicionar campo de data baseado nesse maskedtextbox, casting para datetime no back-end e etc.-->
+                                    <CheckBox  Canvas.Left="80" Canvas.Bottom="-66"/>
                                     <Button Width="80" Height="68" Canvas.Right="90" Canvas.Top="5" Click="EditTask" Style="{StaticResource StandardActionBtn}" >
                                         <Button.Content>
-                                            <TextBlock Text="Edit" Foreground="White"></TextBlock>
+                                            <TextBlock Text="Edit" Foreground="White"/>
                                         </Button.Content>
                                     </Button>
 
@@ -59,6 +62,8 @@
                                     <TextBox Width="120" Canvas.Left="60" Canvas.Bottom="-25" Text="{Binding Path=TaskName, UpdateSourceTrigger=Explicit}" x:Name="NameToSave"/>
                                     <TextBlock Padding="5,29,0,0" FontWeight="Bold" FontSize="15" Foreground="AntiqueWhite"  Text="Descrição:" />
                                     <TextBox Width="120" Canvas.Left="85" Canvas.Bottom="-50" Text="{Binding Path=TaskDesc, UpdateSourceTrigger=Explicit}" x:Name="DescToSave"/>
+                                    <TextBlock Padding="5,29,0,0" FontWeight="Bold" FontSize="15" Canvas.Left="190" Canvas.Bottom="-26"  Foreground="AntiqueWhite"  Text="Data:"/>
+                                    <xctk:MaskedTextBox Width="70" Canvas.Bottom="-27" Canvas.Left="235" Height="20" Watermark="__/__/____" Mask="00/00/0000" PromptChar="_" Text="{Binding Path=HourTask, StringFormat='dd/MM/yyyy'}" x:Name="DateToSave"/>
                                     <Button Content="Salvar" Click="SaveChanges" Canvas.Bottom="-75" Canvas.Left="5" BorderThickness="2" Width="80"/>
                                     <Button Background="Red" Content="Cancelar" Click="EditTask" Canvas.Bottom="-75" Canvas.Left="90" BorderThickness="2" Width="80"/>
                                 </Canvas>

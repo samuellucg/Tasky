@@ -66,24 +66,62 @@ namespace Tasky.Models
             }
         }
 
-        private TimeSpan _hourTask;
+        //private TimeSpan _hourTask;
 
-        public TimeSpan HourTask
+        //public TimeSpan HourTask
+        //{
+        //    get
+        //    {
+        //        return _hourTask;
+        //    }
+
+        //    set 
+        //    {
+        //       if (_hourTask != value)
+        //       {
+        //           _hourTask = value;
+        //           OnPropertyChanged("HourTask");
+        //       }
+        //    }
+        //}
+
+        private DateTime _hourTask;
+
+        public DateTime HourTask
         {
             get
             {
                 return _hourTask;
             }
 
-            set 
+            set
             {
-               if (_hourTask != value)
-               {
-                   _hourTask = value;
-                   OnPropertyChanged("HourTask");
-               }
+                if (_hourTask != value)
+                {
+                    _hourTask = value;
+                    OnPropertyChanged("HourTask");
+                }
             }
         }
+
+        //private string _hourTask;
+
+        //public string HourTask
+        //{
+        //    get
+        //    {
+        //        return _hourTask;
+        //    }
+
+        //    set
+        //    {
+        //        if (_hourTask != value)
+        //        {
+        //            _hourTask = value;
+        //            OnPropertyChanged("HourTask");
+        //        }
+        //    }
+        //}
 
         private bool _isEditingTask;
 
@@ -119,7 +157,7 @@ namespace Tasky.Models
 
         #endregion
 
-        public Task(string taskName, bool notifyTask, string taskDesc, TimeSpan hourTask )
+        public Task(string taskName, bool notifyTask, string taskDesc, DateTime hourTask )
         {
             TaskName = taskName;
             TaskDesc = taskDesc;
