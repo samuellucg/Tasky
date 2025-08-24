@@ -31,7 +31,7 @@
         <StackPanel Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" >
             <TextBlock Text="Nome da tarefa:" FontWeight="Bold" Margin="5,5,0,0"      FontSize="16" Foreground="White"/>
             <TextBlock Text="Descrição da tarefa:" FontWeight="Bold" Margin="5,5,0,0" FontSize="16" Foreground="White"/>
-            <TextBlock Text="Data:" FontWeight="Bold" Margin="5,5,0,0"                FontSize="16" Foreground="White"/>
+            <TextBlock Text="Data / Hora:" FontWeight="Bold" Margin="5,5,0,0"                FontSize="16" Foreground="White"/>
             <TextBlock Text="Notificar:" FontWeight="Bold" Margin="5,0,0,0"           FontSize="16" Foreground="White"/>
         </StackPanel>
 
@@ -39,6 +39,7 @@
             <TextBox x:Name="taskName" Margin="5,8,0,0" />
             <TextBox x:Name="taskDesc" Margin="5,8,0,0" />
             <xctk:MaskedTextBox Width="70" Margin="-120,8,0,0"  Height="20" Watermark="__/__/____" Mask="00/00/0000" PromptChar="_" x:Name="taskDate"/>
+            <xctk:MaskedTextBox Width="40" Margin="10,-19,0,0"  Height="20" Watermark="00:00" Mask="00:00" PromptChar="_" x:Name="taskHour"/>
             <CheckBox x:Name="taskNot" Margin="5,8,0,0" />
         </StackPanel>
             <!--<TextBox x:Name="fazerSelect" Margin="5,8,0,0" /> --><!-- Alterar para select menu -->

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -39,10 +40,9 @@ namespace Tasky.Views.Utils
         {
             try
             {
-                var validDate = DateTime.Parse(taskDate.Text);
-                //var actualYear = DateTime.Now.Year;
+                var validDate = taskHour.Text == "__:__" ? DateTime.Parse(taskDate.Text) : DateTime.Parse(string.Format("{0} {1}", taskDate.Text, taskHour.Text));       
                 var actualDate = DateTime.Now;
-                if (taskName.Text.Length > 1 && taskDesc.Text.Length > 1 && validDate.Year >= actualDate.Year && validDate.Month >= actualDate.Month && validDate.Day >= actualDate.Day)
+                if (taskName.Text.Length > 1 && taskDesc.Text.Length > 1 && validDate > actualDate) // validDate.Year >= actualDate.Year && validDate.Month >= actualDate.Month && validDate.Day >= actualDate.Day && 
                 {
                     var taskCreated = new Models.Task(taskName.Text, taskNot.IsChecked.Value, taskDesc.Text, validDate); // fazer campo pra mandar data.
                     if (taskCreated != null)
@@ -75,16 +75,16 @@ namespace Tasky.Views.Utils
                     }
                 }
 
-                else if (validDate.Year < actualDate.Year || validDate.Month < actualDate.Month || validDate.Day < actualDate.Day)
+                else if (validDate < actualDate) // validDate.Year < actualDate.Year || validDate.Month < actualDate.Month || validDate.Day < actualDate.Day
                 {
                     //new MessageWarning(string.Format("Deve ser salvo para anos\nentre {0} ou mais.", actualDate.Year.ToString()));
-                    new MessageWarning(string.Format("A data deve ser posterior a\n              {0}/{1}/{2}", actualDate.Day.ToString(),actualDate.Month.ToString(),actualDate.Year.ToString()));
+                    new MessageWarning(string.Format("A data/hora deve ser posterior a\n              {0}", actualDate.ToString()));
                 }
 
                 else
                 {
                     new MessageWarning("Erro ao salvar");
-                    Close();
+                    //Close();
                 }
             }
             catch (System.FormatException)

@@ -40,9 +40,12 @@
                                 <Canvas Visibility="{Binding IsEditingTask,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ShowList}}">
                                     <TextBlock Padding="5,3,0,0" HorizontalAlignment="Left" FontWeight="Bold" Foreground="AntiqueWhite" FontSize="15" Text="{Binding Path=TaskName}" x:Name="nameDisplay"/>
                                     <TextBlock HorizontalAlignment="Left" FontWeight="Bold" FontSize="15" Padding="5,23,0,0" Foreground="AntiqueWhite" Text="{Binding Path=TaskDesc}" x:Name="descDisplay"/>
-                                    <xctk:MaskedTextBox Width="70" Canvas.Bottom="-65" Canvas.Left="5" Height="20" Watermark="__/__/____" Mask="00/00/0000" PromptChar="_" Text="{Binding Path=HourTask, StringFormat='dd/MM/yyyy'}" IsEnabled="False"/> 
+                                    <xctk:MaskedTextBox Width="70" Canvas.Bottom="-65" Canvas.Left="5" Height="20" Watermark="__/__/____" Mask="00/00/0000" PromptChar="_" Text="{Binding Path=HourTask, StringFormat='dd/MM/yyyy'}" IsEnabled="False"/>
+                                    <!--<xctk:MaskedTextBox Width="40" Canvas.Left="80" Canvas.Bottom="-65" Height="20" Watermark="00:00" Mask="00:00" PromptChar="_" IsEnabled="False" Text="{Binding Path=HourTask, StringFormat='hh:ms'}"/>-->
+                                    <xctk:MaskedTextBox Width="40" Canvas.Left="80" Canvas.Bottom="-65" Height="20" Watermark="00:00" Mask="00:00" PromptChar="_" IsEnabled="False" Text="{Binding Path=HourTask, StringFormat='HH:mm'}"/>
                                     <!--Adicionar campo de data baseado nesse maskedtextbox, casting para datetime no back-end e etc.-->
-                                    <CheckBox  Canvas.Left="80" Canvas.Bottom="-66"/>
+                                    <!--<CheckBox  Canvas.Left="80" Canvas.Bottom="-66"/>-->
+                                    <CheckBox  Canvas.Left="135" Canvas.Bottom="-65"/>
                                     <Button Width="80" Height="68" Canvas.Right="90" Canvas.Top="5" Click="EditTask" Style="{StaticResource StandardActionBtn}" >
                                         <Button.Content>
                                             <TextBlock Text="Edit" Foreground="White"/>
@@ -63,7 +66,9 @@
                                     <TextBlock Padding="5,29,0,0" FontWeight="Bold" FontSize="15" Foreground="AntiqueWhite"  Text="Descrição:" />
                                     <TextBox Width="120" Canvas.Left="85" Canvas.Bottom="-50" Text="{Binding Path=TaskDesc, UpdateSourceTrigger=Explicit}" x:Name="DescToSave"/>
                                     <TextBlock Padding="5,29,0,0" FontWeight="Bold" FontSize="15" Canvas.Left="190" Canvas.Bottom="-26"  Foreground="AntiqueWhite"  Text="Data:"/>
-                                    <xctk:MaskedTextBox Width="70" Canvas.Bottom="-27" Canvas.Left="235" Height="20" Watermark="__/__/____" Mask="00/00/0000" PromptChar="_" Text="{Binding Path=HourTask, StringFormat='dd/MM/yyyy'}" x:Name="DateToSave"/>
+                                    <xctk:MaskedTextBox Width="70" Canvas.Bottom="-27" Canvas.Left="235" Height="20" Watermark="__/__/____" Mask="00/00/0000" PromptChar="_" Text="{Binding Path=HourTask, StringFormat='dd/MM/yyyy', UpdateSourceTrigger=Explicit}" x:Name="DateToSave"/>
+                                    <TextBlock Padding="5,29,0,0" FontWeight="Bold" FontSize="15" Canvas.Left="210" Canvas.Bottom="-52"  Foreground="AntiqueWhite"  Text="Hora:"/>
+                                    <xctk:MaskedTextBox Width="40" Canvas.Left="257" Canvas.Bottom="-53" Height="20" Watermark="00:00" Mask="00:00" PromptChar="_" Text="{Binding Path=HourTask, StringFormat='HH:mm', UpdateSourceTrigger=Explicit}" x:Name="HourToSave"/>
                                     <Button Content="Salvar" Click="SaveChanges" Canvas.Bottom="-75" Canvas.Left="5" BorderThickness="2" Width="80"/>
                                     <Button Background="Red" Content="Cancelar" Click="EditTask" Canvas.Bottom="-75" Canvas.Left="90" BorderThickness="2" Width="80"/>
                                 </Canvas>

@@ -11,6 +11,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Xml;
 using Tasky.Models;
 using Tasky.ViewModels;
 using Tasky.Views.Utils;
@@ -38,14 +39,13 @@ namespace Tasky.Views
         public void AddTask(object sender, RoutedEventArgs e)
         {
             var modal = new AddModal(_vm);
-            modal.ShowDialog(); 
+            modal.ShowDialog();
         }
 
         public void EditTask(object sender, RoutedEventArgs e)
         {
             var previewTask = (sender as Button).DataContext as Models.Task;
-            //var testTask = (sender as TextBox).Text;
-
+            
             if (_selectedTaskName == null && _selectedTaskDesc == null)
             {
                 _selectedTaskName = previewTask.TaskName;
@@ -53,12 +53,7 @@ namespace Tasky.Views
                 _selectedTaskDate = previewTask.HourTask;
             }
 
-            //if (_selectedTaskName != null && _selectedTaskDesc != null)
-            //{
-            //    previewTask.TaskName = _selectedTaskName;
-            //    previewTask.TaskDesc = _selectedTaskDesc;
-            //}
-
+            
             if (!previewTask.IsEditingTask)
             {
                 previewTask.IsEditingTask = true;
@@ -71,7 +66,6 @@ namespace Tasky.Views
                 previewTask.IsEditingTask = false;
                 _selectedTaskName = null;
                 _selectedTaskDesc = null;
-                //_selectedTaskDate = DateTime.;
 
                 ReloadEditList(sender);
 
@@ -106,11 +100,16 @@ namespace Tasky.Views
         public void SaveChanges(object sender, RoutedEventArgs e)
         {
             var newTask = (sender as Button).DataContext as Models.Task;
+            var keepEditing = false;
             newTask.CanChange = true;
-            var test = (sender as Button).Parent;
-            DependencyObject parent = test;
+            var dateToSaveStr = string.Empty;
+            var hourToSaveStr = string.Empty;
 
-            if (parent is Canvas canvas)
+            var parentClass = (sender as Button).Parent;
+
+            var toUpdate = new List<TextBox>();
+
+            if (parentClass is Canvas canvas)
             {
                 foreach (var child in LogicalTreeHelper.GetChildren(canvas))
                 {
@@ -118,44 +117,68 @@ namespace Tasky.Views
                     {
                         if (tb.Name == "NameToSave")
                         {
+                            toUpdate.Add(tb);
                             newTask.TaskName = tb.Text;
                         }
                         if (tb.Name == "DescToSave")
                         {
+                            toUpdate.Add(tb);
                             newTask.TaskDesc = tb.Text;
                         }
-                        if(tb.Name == "DateToSave")
+                        if (tb.Name == "DateToSave")
                         {
-                            newTask.HourTask = DateTime.Parse(tb.Text);
+                            toUpdate.Add(tb);
+                            dateToSaveStr = tb.Text;
+                        }
+                        if (tb.Name == "HourToSave")
+                        {
+                            toUpdate.Add(tb);
+                            hourToSaveStr = tb.Text;
                         }
 
-                        tb.GetBindingExpression(TextBox.TextProperty).UpdateSource(); // Quando o update source trigger é explicit. Precisamos atualizar dessa forma para isso o update source.
+
                     }
+                }
+
+                var validDate = DateTime.Parse(($"{dateToSaveStr} {hourToSaveStr}:00"));
+
+                if (validDate < DateTime.Now)
+                {
+                    new MessageWarning(string.Format("A data/hora deve ser posterior a\n              {0}", DateTime.Now.ToString()));
+                }
+
+                else
+                {
+                    foreach (var i in toUpdate)
+                    {
+                        i.GetBindingExpression(TextBox.TextProperty).UpdateSource();
+                    }
+
+                    keepEditing = true;
+                    newTask.HourTask = validDate;
                 }
             }
 
-            newTask.CanChange = false;
-
-
-
-            if (newTask.TaskName != _selectedTaskName || newTask.TaskDesc != _selectedTaskDesc || newTask.HourTask != _selectedTaskDate)
+            if (keepEditing)
             {
-                //newTask.CanChange = true;
-                _vm.DB.UpdateTask(_selectedTaskDesc, _selectedTaskName, newTask.TaskDesc, newTask.TaskName, newTask.HourTask,_selectedTaskDate);
-                //MessageBox.Show("Edições salvas"); // Mudar isso para um modal criado por você.
-                MessageConfirmation message = new MessageConfirmation("Edições salvas", false);
-                message.ShowDialog();
-                EditTask(sender, e);
-            }
-            else if (newTask.TaskName == _selectedTaskName && newTask.TaskDesc == _selectedTaskDesc && newTask.HourTask == _selectedTaskDate)
-            {
-                MessageConfirmation message = new MessageConfirmation("Elas são as mesmas, não há porque salvar", false);
-                message.ShowDialog();
-                //MessageBox.Show("Elas são as mesmas, não há porque salvar"); // Mudar isso para um modal criado por você.
-            }
-            else
-            {
-                MessageBox.Show("Erro desconhecido"); // Mudar isso para um modal criado por você.
+                newTask.CanChange = false;
+
+                if (newTask.TaskName != _selectedTaskName || newTask.TaskDesc != _selectedTaskDesc || newTask.HourTask != _selectedTaskDate)
+                {
+                    _vm.DB.UpdateTask(_selectedTaskDesc, _selectedTaskName, newTask.TaskDesc, newTask.TaskName, newTask.HourTask, _selectedTaskDate);
+                    MessageConfirmation message = new MessageConfirmation("Edições salvas", false);
+                    message.ShowDialog();
+                    EditTask(sender, e);
+                }
+                else if (newTask.TaskName == _selectedTaskName && newTask.TaskDesc == _selectedTaskDesc && newTask.HourTask == _selectedTaskDate)
+                {
+                    MessageConfirmation message = new MessageConfirmation("Elas são as mesmas, não há porque salvar", false);
+                    message.ShowDialog();
+                }
+                else
+                {
+                    MessageBox.Show("Erro desconhecido");
+                }
             }
         }
 
@@ -172,21 +195,19 @@ namespace Tasky.Views
                 {
                     var newTasks = _vm.DB.DeleteTask(taskToDelete);
                     _vm.TasksToShow = newTasks;
-                    //MessageBox.Show("Tarefa deletada"); // Mudar isso para um modal criado por você.
                     MessageConfirmation message = new MessageConfirmation("Tarefa deletada", false);
                     message.ShowDialog();
 
                 }
                 else
                 {
-                    //MessageBox.Show("Operação cancelada"); // Mudar isso para um modal criado por você.
                     MessageConfirmation message = new MessageConfirmation("Operação cancelada", false);
                     message.ShowDialog();
                 }
             }
             else
             {
-                MessageBox.Show("Erro desconhecido."); // Mudar isso para um modal criado por você.
+                MessageBox.Show("Erro desconhecido.");
             }
         }
     }
