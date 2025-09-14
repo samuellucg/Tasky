@@ -24,7 +24,7 @@ namespace Tasky.ViewModels
 
             get
             {
-                _tasksToShow = DB.GetAllTasks();
+                _tasksToShow = DB.GetAllTasks().Result;
                 return _tasksToShow;
             }
 

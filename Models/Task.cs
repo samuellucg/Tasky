@@ -10,8 +10,12 @@ namespace Tasky.Models
 {
     public class Task : BaseViewModel
     {
+
+        private MainViewModel _viewModel;
+
+
         #region Properties
-      
+
         private string _taskName;
 
         public string TaskName
@@ -153,11 +157,25 @@ namespace Tasky.Models
             }
         }
 
+        private int _taskId;
+
+        public int TaskId
+        {
+            get => _taskId;
+            set
+            {
+                if(_taskId != value)
+                {
+                    _taskId = value;
+                }
+            }
+        }
+
 
 
         #endregion
 
-        public Task(string taskName, bool notifyTask, string taskDesc, DateTime hourTask )
+        public Task(string taskName, bool notifyTask, string taskDesc, DateTime hourTask)
         {
             TaskName = taskName;
             TaskDesc = taskDesc;

@@ -58,7 +58,7 @@ namespace Tasky.Views.Utils
                                 using (Tasky.Database.Database DB = new Tasky.Database.Database())
                                 {
                                     DB.CreateTask(taskCreated);
-                                    _viewModel.TasksToShow = DB.GetAllTasks();
+                                    _viewModel.TasksToShow = DB.GetAllTasks().Result;
                                 }
                                 taskName.Text = taskDesc.Text = null;
                                 taskNot.IsChecked = false;

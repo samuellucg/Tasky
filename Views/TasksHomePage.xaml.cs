@@ -194,9 +194,12 @@ namespace Tasky.Views
                 if (userInput.UserResponse)
                 {
                     var newTasks = _vm.DB.DeleteTask(taskToDelete);
-                    _vm.TasksToShow = newTasks;
-                    MessageConfirmation message = new MessageConfirmation("Tarefa deletada", false);
-                    message.ShowDialog();
+                    if (newTasks.Result)
+                    {
+                        _vm.TasksToShow = _vm.DB.GetAllTasks().Result;
+                        MessageConfirmation message = new MessageConfirmation("Tarefa deletada", false);
+                        message.ShowDialog();
+                    }
 
                 }
                 else
