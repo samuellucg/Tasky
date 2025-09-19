@@ -28,6 +28,7 @@ namespace Tasky.Views
         private string _selectedTaskName;
         private string _selectedTaskDesc;
         private DateTime _selectedTaskDate;
+        private bool? _selectedTaskNotify;
 
         public TasksHomePage(MainViewModel vm)
         {
@@ -39,7 +40,8 @@ namespace Tasky.Views
         public void AddTask(object sender, RoutedEventArgs e)
         {
             var modal = new AddModal(_vm);
-            modal.ShowDialog();
+            if (!modal.IsActive)
+                modal.ShowDialog();
         }
 
         public void EditTask(object sender, RoutedEventArgs e)
@@ -51,6 +53,7 @@ namespace Tasky.Views
                 _selectedTaskName = previewTask.TaskName;
                 _selectedTaskDesc = previewTask.TaskDesc;
                 _selectedTaskDate = previewTask.HourTask;
+                _selectedTaskNotify = previewTask.NotifyTask;
             }
 
             
@@ -66,6 +69,7 @@ namespace Tasky.Views
                 previewTask.IsEditingTask = false;
                 _selectedTaskName = null;
                 _selectedTaskDesc = null;
+                _selectedTaskNotify = null;
 
                 ReloadEditList(sender);
 
@@ -78,6 +82,7 @@ namespace Tasky.Views
                 previewTask.TaskDesc = _selectedTaskDesc;
                 _selectedTaskName = null;
                 _selectedTaskDesc = null;
+                _selectedTaskNotify = null;
             }
         }
 
@@ -135,9 +140,13 @@ namespace Tasky.Views
                             toUpdate.Add(tb);
                             hourToSaveStr = tb.Text;
                         }
-
-
                     }
+
+                    if (child is ComboBox cb)
+                    {
+                        newTask.NotifyTask = cb.Text == "True" ? true : false;
+                    }
+
                 }
 
                 var validDate = DateTime.Parse(($"{dateToSaveStr} {hourToSaveStr}:00"));
@@ -163,14 +172,14 @@ namespace Tasky.Views
             {
                 newTask.CanChange = false;
 
-                if (newTask.TaskName != _selectedTaskName || newTask.TaskDesc != _selectedTaskDesc || newTask.HourTask != _selectedTaskDate)
+                if (newTask.TaskName != _selectedTaskName || newTask.TaskDesc != _selectedTaskDesc || newTask.HourTask != _selectedTaskDate || newTask.NotifyTask != _selectedTaskNotify)
                 {
-                    _vm.DB.UpdateTask(_selectedTaskDesc, _selectedTaskName, newTask.TaskDesc, newTask.TaskName, newTask.HourTask, _selectedTaskDate);
+                    _vm.DB.UpdateTask(_selectedTaskDesc, _selectedTaskName, newTask.TaskDesc, newTask.TaskName, newTask.HourTask, _selectedTaskDate, _selectedTaskNotify, newTask.NotifyTask);
                     MessageConfirmation message = new MessageConfirmation("Edições salvas", false);
                     message.ShowDialog();
                     EditTask(sender, e);
                 }
-                else if (newTask.TaskName == _selectedTaskName && newTask.TaskDesc == _selectedTaskDesc && newTask.HourTask == _selectedTaskDate)
+                else if (newTask.TaskName == _selectedTaskName && newTask.TaskDesc == _selectedTaskDesc && newTask.HourTask == _selectedTaskDate && newTask.NotifyTask == _selectedTaskNotify)
                 {
                     MessageConfirmation message = new MessageConfirmation("Elas são as mesmas, não há porque salvar", false);
                     message.ShowDialog();
@@ -182,7 +191,7 @@ namespace Tasky.Views
             }
         }
 
-        public void DeleteTask(object sender, RoutedEventArgs e)
+        public async void DeleteTask(object sender, RoutedEventArgs e)
         {
             var taskToDelete = (sender as Button).DataContext as Models.Task;
 
@@ -193,10 +202,10 @@ namespace Tasky.Views
             {
                 if (userInput.UserResponse)
                 {
-                    var newTasks = _vm.DB.DeleteTask(taskToDelete);
-                    if (newTasks.Result)
+                    var newTasks = await _vm.DB.DeleteTask(taskToDelete);
+                    if (newTasks)
                     {
-                        _vm.TasksToShow = _vm.DB.GetAllTasks().Result;
+                        _vm.TasksToShow = await _vm.DB.GetAllTasks();
                         MessageConfirmation message = new MessageConfirmation("Tarefa deletada", false);
                         message.ShowDialog();
                     }

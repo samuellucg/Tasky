@@ -24,7 +24,8 @@ namespace Tasky.Views.Utils
             this.Owner = Application.Current.MainWindow;
             InitializeComponent();
             MessageToUser.Text = message;
-            ShowDialog();
+            if(!IsActive)
+                ShowDialog();
         }
 
     }

@@ -36,11 +36,11 @@ namespace Tasky.Views.Utils
             _viewModel = actualTasks;
         }
 
-        private void SubmitInfo(object sender, RoutedEventArgs e)
+        private async void SubmitInfo(object sender, RoutedEventArgs e)
         {
             try
             {
-                var validDate = taskHour.Text == "__:__" ? DateTime.Parse(taskDate.Text) : DateTime.Parse(string.Format("{0} {1}", taskDate.Text, taskHour.Text));       
+                var validDate = taskHour.Text == "__:__" ? DateTime.Parse(taskDate.Text) : DateTime.Parse(string.Format("{0} {1}", taskDate.Text, taskHour.Text));
                 var actualDate = DateTime.Now;
                 if (taskName.Text.Length > 1 && taskDesc.Text.Length > 1 && validDate > actualDate) // validDate.Year >= actualDate.Year && validDate.Month >= actualDate.Month && validDate.Day >= actualDate.Day && 
                 {
@@ -48,30 +48,37 @@ namespace Tasky.Views.Utils
                     if (taskCreated != null)
                     {
                         MessageConfirmation userInput = new MessageConfirmation("Tem certeza que deseja prosseguir?");
-                        bool? hasShowed = userInput.ShowDialog();
-                        if (hasShowed is true)
+                        if (!userInput.IsActive)
                         {
-                            bool userChoice = userInput.UserResponse;
-
-                            if (userChoice)
+                            bool? hasShowed = userInput.ShowDialog();
+                            if (hasShowed is true)
                             {
-                                using (Tasky.Database.Database DB = new Tasky.Database.Database())
+                                bool userChoice = userInput.UserResponse;
+
+                                if (userChoice)
                                 {
-                                    DB.CreateTask(taskCreated);
-                                    _viewModel.TasksToShow = DB.GetAllTasks().Result;
-                                }
-                                taskName.Text = taskDesc.Text = null;
-                                taskNot.IsChecked = false;
+                                    using (Tasky.Database.Database DB = new Tasky.Database.Database())
+                                    {
+                                        if (await DB.CreateTask(taskCreated))
+                                            _viewModel.TasksToShow = await DB.GetAllTasks();
+                                        else
+                                            new MessageWarning("Erro ao criar tarefa");
+                                    }
+                                    taskName.Text = taskDesc.Text = null;
+                                    taskNot.IsChecked = false;
 
-                                new MessageWarning("Operação realizada");
-                                Close();
-                            }
-                            else
-                            {
-                                new MessageWarning("Operação abortada");
-                                //Close();
+                                    new MessageWarning("Operação realizada");
+                                    Close();
+                                }
+                                else
+                                {
+                                    new MessageWarning("Operação abortada");
+                                    //Close();
+                                }
                             }
                         }
+                        else
+                            MessageBox.Show("THREAD ERROR");
                     }
                 }
 
@@ -91,7 +98,7 @@ namespace Tasky.Views.Utils
             {
                 new MessageWarning("Data inválida, insira novamente.");
                 //Close();
-            }            
+            }
 
         }
 

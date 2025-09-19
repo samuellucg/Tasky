@@ -126,12 +126,12 @@ namespace Tasky.Database
         //    GetAllTasks();
         //}
 
-        public async void UpdateTask(string oldDesc, string oldName, string newDesc, string newName, DateTime newDate, DateTime oldDate)
+        public async void UpdateTask(string oldDesc, string oldName, string newDesc, string newName, DateTime newDate, DateTime oldDate, bool? oldNotifyTask, bool newNotifyTask)
         {
             try
             {
                 var tasks = await GetAllTasks();
-                var xt = tasks.FirstOrDefault(x => x.TaskName == oldName && x.TaskDesc == oldDesc && x.HourTask == oldDate);
+                var xt = tasks.FirstOrDefault(x => x.TaskName == oldName && x.TaskDesc == oldDesc && x.HourTask == oldDate && x.NotifyTask == oldNotifyTask);
 
                 if (xt != null)
                 {
@@ -140,6 +140,7 @@ namespace Tasky.Database
                         { "TaskName", newName },
                         { "TaskDesc", newDesc },
                         { "HourTask", newDate },
+                        { "NotifyTask", newNotifyTask},
                     };
                     var content = new StringContent(JsonConvert.SerializeObject(payload), Encoding.UTF8, "application/json");
                     var response = await client.PutAsync($"{client.BaseAddress}?taskId={xt.TaskId}", content).ConfigureAwait(false);
