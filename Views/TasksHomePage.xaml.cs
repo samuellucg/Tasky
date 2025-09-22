@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Xml;
+using NLog;
 using Tasky.Models;
 using Tasky.ViewModels;
 using Tasky.Views.Utils;
@@ -29,6 +30,7 @@ namespace Tasky.Views
         private string _selectedTaskDesc;
         private DateTime _selectedTaskDate;
         private bool? _selectedTaskNotify;
+        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
         public TasksHomePage(MainViewModel vm)
         {
@@ -39,187 +41,224 @@ namespace Tasky.Views
 
         public void AddTask(object sender, RoutedEventArgs e)
         {
-            var modal = new AddModal(_vm);
-            if (!modal.IsActive)
-                modal.ShowDialog();
+            try
+            {
+                var modal = new AddModal(_vm);
+                if (!modal.IsActive)
+                    modal.ShowDialog();
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex);
+            }
         }
 
         public void EditTask(object sender, RoutedEventArgs e)
         {
-            var previewTask = (sender as Button).DataContext as Models.Task;
-            
-            if (_selectedTaskName == null && _selectedTaskDesc == null)
+            try
             {
-                _selectedTaskName = previewTask.TaskName;
-                _selectedTaskDesc = previewTask.TaskDesc;
-                _selectedTaskDate = previewTask.HourTask;
-                _selectedTaskNotify = previewTask.NotifyTask;
+                var previewTask = (sender as Button).DataContext as Models.Task;
+
+                if (_selectedTaskName == null && _selectedTaskDesc == null)
+                {
+                    _selectedTaskName = previewTask.TaskName;
+                    _selectedTaskDesc = previewTask.TaskDesc;
+                    _selectedTaskDate = previewTask.HourTask;
+                    _selectedTaskNotify = previewTask.NotifyTask;
+                }
+
+
+                if (!previewTask.IsEditingTask)
+                {
+                    previewTask.IsEditingTask = true;
+                    previewTask.CanChange = false;
+                }
+
+                else if (previewTask.IsEditingTask)
+                {
+                    previewTask.CanChange = true;
+                    previewTask.IsEditingTask = false;
+                    _selectedTaskName = null;
+                    _selectedTaskDesc = null;
+                    _selectedTaskNotify = null;
+
+                    ReloadEditList(sender);
+
+                }
+
+                else
+                {
+                    previewTask.IsEditingTask = false;
+                    previewTask.TaskName = _selectedTaskName;
+                    previewTask.TaskDesc = _selectedTaskDesc;
+                    _selectedTaskName = null;
+                    _selectedTaskDesc = null;
+                    _selectedTaskNotify = null;
+                }
             }
-
-            
-            if (!previewTask.IsEditingTask)
+            catch (Exception ex)
             {
-                previewTask.IsEditingTask = true;
-                previewTask.CanChange = false;
-            }
-
-            else if (previewTask.IsEditingTask)
-            {
-                previewTask.CanChange = true;
-                previewTask.IsEditingTask = false;
-                _selectedTaskName = null;
-                _selectedTaskDesc = null;
-                _selectedTaskNotify = null;
-
-                ReloadEditList(sender);
-
-            }
-
-            else
-            {
-                previewTask.IsEditingTask = false;
-                previewTask.TaskName = _selectedTaskName;
-                previewTask.TaskDesc = _selectedTaskDesc;
-                _selectedTaskName = null;
-                _selectedTaskDesc = null;
-                _selectedTaskNotify = null;
+                logger.Error(ex);
             }
         }
 
         private void ReloadEditList(object sender)
         {
-            DependencyObject test = (sender as Button).Parent;
-
-            if (test is Canvas canvas)
+            try
             {
-                foreach (var child in LogicalTreeHelper.GetChildren(canvas))
+                DependencyObject test = (sender as Button).Parent;
+
+                if (test is Canvas canvas)
                 {
-                    if (child is TextBox tb)
+                    foreach (var child in LogicalTreeHelper.GetChildren(canvas))
                     {
-                        tb.GetBindingExpression(TextBox.TextProperty).UpdateTarget(); // Quando o update source trigger é explicit. Precisamos "puxar" as informações dessa forma para isso o update target. No caso o reload
+                        if (child is TextBox tb)
+                        {
+                            tb.GetBindingExpression(TextBox.TextProperty).UpdateTarget(); // Quando o update source trigger é explicit. Precisamos "puxar" as informações dessa forma para isso o update target. No caso o reload
+                        }
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex);
             }
         }
 
         public void SaveChanges(object sender, RoutedEventArgs e)
         {
-            var newTask = (sender as Button).DataContext as Models.Task;
-            var keepEditing = false;
-            newTask.CanChange = true;
-            var dateToSaveStr = string.Empty;
-            var hourToSaveStr = string.Empty;
-
-            var parentClass = (sender as Button).Parent;
-
-            var toUpdate = new List<TextBox>();
-
-            if (parentClass is Canvas canvas)
+            try
             {
-                foreach (var child in LogicalTreeHelper.GetChildren(canvas))
+
+                var newTask = (sender as Button).DataContext as Models.Task;
+                var keepEditing = false;
+                newTask.CanChange = true;
+                var dateToSaveStr = string.Empty;
+                var hourToSaveStr = string.Empty;
+
+                var parentClass = (sender as Button).Parent;
+
+                var toUpdate = new List<TextBox>();
+
+                if (parentClass is Canvas canvas)
                 {
-                    if (child is TextBox tb)
+                    foreach (var child in LogicalTreeHelper.GetChildren(canvas))
                     {
-                        if (tb.Name == "NameToSave")
+                        if (child is TextBox tb)
                         {
-                            toUpdate.Add(tb);
-                            newTask.TaskName = tb.Text;
+                            if (tb.Name == "NameToSave")
+                            {
+                                toUpdate.Add(tb);
+                                newTask.TaskName = tb.Text;
+                            }
+                            if (tb.Name == "DescToSave")
+                            {
+                                toUpdate.Add(tb);
+                                newTask.TaskDesc = tb.Text;
+                            }
+                            if (tb.Name == "DateToSave")
+                            {
+                                toUpdate.Add(tb);
+                                dateToSaveStr = tb.Text;
+                            }
+                            if (tb.Name == "HourToSave")
+                            {
+                                toUpdate.Add(tb);
+                                hourToSaveStr = tb.Text;
+                            }
                         }
-                        if (tb.Name == "DescToSave")
+
+                        if (child is ComboBox cb)
                         {
-                            toUpdate.Add(tb);
-                            newTask.TaskDesc = tb.Text;
+                            newTask.NotifyTask = cb.Text == "True" ? true : false;
                         }
-                        if (tb.Name == "DateToSave")
-                        {
-                            toUpdate.Add(tb);
-                            dateToSaveStr = tb.Text;
-                        }
-                        if (tb.Name == "HourToSave")
-                        {
-                            toUpdate.Add(tb);
-                            hourToSaveStr = tb.Text;
-                        }
+
                     }
 
-                    if (child is ComboBox cb)
+                    var validDate = DateTime.Parse(($"{dateToSaveStr} {hourToSaveStr}:00"));
+
+                    if (validDate < DateTime.Now)
                     {
-                        newTask.NotifyTask = cb.Text == "True" ? true : false;
+                        new MessageWarning(string.Format("A data/hora deve ser posterior a\n              {0}", DateTime.Now.ToString()));
                     }
 
+                    else
+                    {
+                        foreach (var i in toUpdate)
+                        {
+                            i.GetBindingExpression(TextBox.TextProperty).UpdateSource();
+                        }
+
+                        keepEditing = true;
+                        newTask.HourTask = validDate;
+                    }
                 }
 
-                var validDate = DateTime.Parse(($"{dateToSaveStr} {hourToSaveStr}:00"));
-
-                if (validDate < DateTime.Now)
+                if (keepEditing)
                 {
-                    new MessageWarning(string.Format("A data/hora deve ser posterior a\n              {0}", DateTime.Now.ToString()));
-                }
+                    newTask.CanChange = false;
 
-                else
-                {
-                    foreach (var i in toUpdate)
+                    if (newTask.TaskName != _selectedTaskName || newTask.TaskDesc != _selectedTaskDesc || newTask.HourTask != _selectedTaskDate || newTask.NotifyTask != _selectedTaskNotify)
                     {
-                        i.GetBindingExpression(TextBox.TextProperty).UpdateSource();
+                        _vm.DB.UpdateTask(_selectedTaskDesc, _selectedTaskName, newTask.TaskDesc, newTask.TaskName, newTask.HourTask, _selectedTaskDate, _selectedTaskNotify, newTask.NotifyTask);
+                        MessageConfirmation message = new MessageConfirmation("Edições salvas", false);
+                        message.ShowDialog();
+                        EditTask(sender, e);
                     }
-
-                    keepEditing = true;
-                    newTask.HourTask = validDate;
+                    else if (newTask.TaskName == _selectedTaskName && newTask.TaskDesc == _selectedTaskDesc && newTask.HourTask == _selectedTaskDate && newTask.NotifyTask == _selectedTaskNotify)
+                    {
+                        MessageConfirmation message = new MessageConfirmation("Elas são as mesmas, não há porque salvar", false);
+                        message.ShowDialog();
+                    }
+                    else
+                    {
+                        MessageBox.Show("Erro desconhecido");
+                    }
                 }
             }
-
-            if (keepEditing)
+            catch (Exception ex)
             {
-                newTask.CanChange = false;
-
-                if (newTask.TaskName != _selectedTaskName || newTask.TaskDesc != _selectedTaskDesc || newTask.HourTask != _selectedTaskDate || newTask.NotifyTask != _selectedTaskNotify)
-                {
-                    _vm.DB.UpdateTask(_selectedTaskDesc, _selectedTaskName, newTask.TaskDesc, newTask.TaskName, newTask.HourTask, _selectedTaskDate, _selectedTaskNotify, newTask.NotifyTask);
-                    MessageConfirmation message = new MessageConfirmation("Edições salvas", false);
-                    message.ShowDialog();
-                    EditTask(sender, e);
-                }
-                else if (newTask.TaskName == _selectedTaskName && newTask.TaskDesc == _selectedTaskDesc && newTask.HourTask == _selectedTaskDate && newTask.NotifyTask == _selectedTaskNotify)
-                {
-                    MessageConfirmation message = new MessageConfirmation("Elas são as mesmas, não há porque salvar", false);
-                    message.ShowDialog();
-                }
-                else
-                {
-                    MessageBox.Show("Erro desconhecido");
-                }
+                logger.Error(ex);
             }
         }
 
         public async void DeleteTask(object sender, RoutedEventArgs e)
         {
-            var taskToDelete = (sender as Button).DataContext as Models.Task;
-
-            MessageConfirmation userInput = new MessageConfirmation("Tem certeza que deseja \n    deletar essa tarefa?");
-            bool? choice = userInput.ShowDialog();
-
-            if (choice is true)
+            try
             {
-                if (userInput.UserResponse)
+
+                var taskToDelete = (sender as Button).DataContext as Models.Task;
+
+                MessageConfirmation userInput = new MessageConfirmation("Tem certeza que deseja \n    deletar essa tarefa?");
+                bool? choice = userInput.ShowDialog();
+
+                if (choice is true)
                 {
-                    var newTasks = await _vm.DB.DeleteTask(taskToDelete);
-                    if (newTasks)
+                    if (userInput.UserResponse)
                     {
-                        _vm.TasksToShow = await _vm.DB.GetAllTasks();
-                        MessageConfirmation message = new MessageConfirmation("Tarefa deletada", false);
+                        var newTasks = await _vm.DB.DeleteTask(taskToDelete);
+                        if (newTasks)
+                        {
+                            _vm.TasksToShow = await _vm.DB.GetAllTasks();
+                            MessageConfirmation message = new MessageConfirmation("Tarefa deletada", false);
+                            message.ShowDialog();
+                        }
+
+                    }
+                    else
+                    {
+                        MessageConfirmation message = new MessageConfirmation("Operação cancelada", false);
                         message.ShowDialog();
                     }
-
                 }
                 else
                 {
-                    MessageConfirmation message = new MessageConfirmation("Operação cancelada", false);
-                    message.ShowDialog();
+                    MessageBox.Show("Erro desconhecido.");
                 }
             }
-            else
+            catch (Exception ex)
             {
-                MessageBox.Show("Erro desconhecido.");
+                logger.Error(ex);
             }
         }
     }

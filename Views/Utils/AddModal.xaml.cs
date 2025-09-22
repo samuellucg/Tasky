@@ -16,6 +16,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using NLog;
 using Tasky.Database;
 using Tasky.Models;
 using Tasky.ViewModels;
@@ -28,6 +29,7 @@ namespace Tasky.Views.Utils
     public partial class AddModal : Window
     {
         private MainViewModel _viewModel;
+        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
         public AddModal(MainViewModel actualTasks)
         {
@@ -98,6 +100,10 @@ namespace Tasky.Views.Utils
             {
                 new MessageWarning("Data inválida, insira novamente.");
                 //Close();
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex);
             }
 
         }

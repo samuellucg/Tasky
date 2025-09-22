@@ -11,6 +11,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using NLog;
 
 namespace Tasky.Views.Utils
 {
@@ -19,13 +20,23 @@ namespace Tasky.Views.Utils
     /// </summary>
     public partial class MessageWarning : Window
     {
+        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+
         public MessageWarning(string message = "Tarefa criada com sucesso!")
         {
-            this.Owner = Application.Current.MainWindow;
-            InitializeComponent();
-            MessageToUser.Text = message;
-            if(!IsActive)
-                ShowDialog();
+            try
+            {
+
+                this.Owner = Application.Current.MainWindow;
+                InitializeComponent();
+                MessageToUser.Text = message;
+                if (!IsActive)
+                    ShowDialog();
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex);
+            }
         }
 
     }

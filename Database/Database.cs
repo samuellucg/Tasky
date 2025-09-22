@@ -14,6 +14,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using Newtonsoft.Json;
+using NLog;
 using Tasky.Models;
 using Tasky.ViewModels;
 
@@ -27,6 +28,7 @@ namespace Tasky.Database
 
 
         //public static string fileName = "Database.json";
+        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
         public static int size;
 
@@ -41,8 +43,16 @@ namespace Tasky.Database
 
         private void MapHttp()
         {
-            client = new HttpClient();
-            client.BaseAddress = new Uri("http://localhost:3000/tasks");
+            try
+            {
+
+                client = new HttpClient();
+                client.BaseAddress = new Uri("http://localhost:3000/tasks");
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex);
+            }
         }
 
         //private void WatchDatabase()
@@ -86,9 +96,10 @@ namespace Tasky.Database
                 Environment.Exit(0);
                 throw;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw;
+                logger.Error(ex);
+                return false;
             }
         }
 
@@ -113,9 +124,10 @@ namespace Tasky.Database
                 Environment.Exit(0);
                 throw;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw;
+                logger.Error(ex);
+                return null;
             }
         }
 
@@ -159,9 +171,9 @@ namespace Tasky.Database
                 Environment.Exit(0);
                 throw;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw;
+                logger.Error(ex);
             }
         }
 
@@ -185,9 +197,10 @@ namespace Tasky.Database
                 Environment.Exit(0);
                 throw;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw;
+                logger.Error(ex);
+                return false;
             }
         }
     }
