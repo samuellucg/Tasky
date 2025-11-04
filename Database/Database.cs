@@ -79,8 +79,8 @@ namespace Tasky.Database
         {
             try
             {
-                size += 1;
-                task.TaskId = size;
+                size += 1; // talvez tira
+                task.TaskId = size; // talvez tirar
                 var content = new StringContent(JsonConvert.SerializeObject(task), Encoding.UTF8, "application/json");
                 var response = await client.PostAsync(client.BaseAddress, content).ConfigureAwait(false);
                 if (response.EnsureSuccessStatusCode().StatusCode == System.Net.HttpStatusCode.OK)
@@ -111,7 +111,7 @@ namespace Tasky.Database
                 if (response.EnsureSuccessStatusCode().StatusCode == System.Net.HttpStatusCode.OK)
                 {
                     var content = await response.Content.ReadAsStringAsync();
-                    size = JsonConvert.DeserializeObject<ObservableCollection<Models.Task>>(content).OrderBy(x => x.TaskId).Select(x => x.TaskId).Last();
+                    size = JsonConvert.DeserializeObject<ObservableCollection<Models.Task>>(content).OrderBy(x => x.TaskId).Select(x => x.TaskId).Last(); // talvez tirar
                     //return JsonConvert.DeserializeObject<ObservableCollection<Models.Task>>(content) ?? new ObservableCollection<Models.Task>();                  
                     return JsonConvert.DeserializeObject<ObservableCollection<Models.Task>>(content) ?? new ObservableCollection<Models.Task>();
                 }
@@ -138,7 +138,7 @@ namespace Tasky.Database
         //    GetAllTasks();
         //}
 
-        public async void UpdateTask(string oldDesc, string oldName, string newDesc, string newName, DateTime newDate, DateTime oldDate, bool? oldNotifyTask, bool newNotifyTask)
+        public async void UpdateTask(string oldDesc, string oldName, string newDesc, string newName, DateTime newDate, DateTime oldDate, bool? oldNotifyTask, bool newNotifyTask, bool oldTaskDone = false, bool newTaskDone = false)
         {
             try
             {
@@ -152,18 +152,22 @@ namespace Tasky.Database
                         { "TaskName", newName },
                         { "TaskDesc", newDesc },
                         { "HourTask", newDate },
+                        { "TaskDone", newTaskDone },
                         { "NotifyTask", newNotifyTask},
                     };
                     var content = new StringContent(JsonConvert.SerializeObject(payload), Encoding.UTF8, "application/json");
                     var response = await client.PutAsync($"{client.BaseAddress}?taskId={xt.TaskId}", content).ConfigureAwait(false);
+                    Console.WriteLine(response.StatusCode);
                     response.EnsureSuccessStatusCode();
                 }
                 else
                 {
-                    MessageBox.Show("Error");
+                    //MessageBox.Show("Error");
                 }
 
             }
+
+#if RELEASE
             catch (Exception ex) when (ex is HttpRequestException || ex is SocketException || ex is WebException)
             {
                 MessageBox.Show("Application gonna restart");
@@ -171,6 +175,7 @@ namespace Tasky.Database
                 Environment.Exit(0);
                 throw;
             }
+#endif
             catch (Exception ex)
             {
                 logger.Error(ex);

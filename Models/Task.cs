@@ -171,6 +171,21 @@ namespace Tasky.Models
             }
         }
 
+        private bool _done = false; // fazer isso ter funcionalidade na tela (tarefa concluida?/não?).
+
+        public bool TaskDone
+        {
+            get => _done;
+
+            set
+            {
+                if(_done != value)
+                {
+                    _done = value;
+                }
+            }
+        }
+
 
 
         #endregion
