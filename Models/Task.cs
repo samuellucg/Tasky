@@ -51,7 +51,7 @@ namespace Tasky.Models
                 }
             }
         }
-        
+
         private string _taskDesc;
 
         public string TaskDesc
@@ -164,7 +164,7 @@ namespace Tasky.Models
             get => _taskId;
             set
             {
-                if(_taskId != value)
+                if (_taskId != value)
                 {
                     _taskId = value;
                 }
@@ -179,13 +179,26 @@ namespace Tasky.Models
 
             set
             {
-                if(_done != value)
+                if (_done != value)
                 {
                     _done = value;
                 }
             }
         }
 
+        private Notify _notifications;
+
+        public Notify Notifications
+        {
+            get => _notifications;
+            set
+            {
+                if (_notifications != value)
+                {
+                    _notifications = value;
+                }
+            }
+        }
 
 
         #endregion
@@ -195,8 +208,22 @@ namespace Tasky.Models
             TaskName = taskName;
             TaskDesc = taskDesc;
             NotifyTask = notifyTask;
-            HourTask = hourTask;
+            HourTask = hourTask;     
+            Notifications = new Notify();
         }
+
+        public class Notify
+        {
+            public bool Sent15min { get; set; }
+            public bool Sent5min { get; set; }
+
+            public Notify()
+            {
+                Sent15min = false;
+                Sent5min =  false;
+            }
+        }
+
     }
 
 }

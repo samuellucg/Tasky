@@ -79,8 +79,8 @@ namespace Tasky.Database
         {
             try
             {
-                size += 1; // talvez tira
-                task.TaskId = size; // talvez tirar
+                size += 1;
+                task.TaskId = size;
                 var content = new StringContent(JsonConvert.SerializeObject(task), Encoding.UTF8, "application/json");
                 var response = await client.PostAsync(client.BaseAddress, content).ConfigureAwait(false);
                 if (response.EnsureSuccessStatusCode().StatusCode == System.Net.HttpStatusCode.OK)
@@ -111,7 +111,7 @@ namespace Tasky.Database
                 if (response.EnsureSuccessStatusCode().StatusCode == System.Net.HttpStatusCode.OK)
                 {
                     var content = await response.Content.ReadAsStringAsync();
-                    size = JsonConvert.DeserializeObject<ObservableCollection<Models.Task>>(content).OrderBy(x => x.TaskId).Select(x => x.TaskId).Last(); // talvez tirar
+                    size = JsonConvert.DeserializeObject<ObservableCollection<Models.Task>>(content).OrderBy(x => x.TaskId).Select(x => x.TaskId).Last();
                     //return JsonConvert.DeserializeObject<ObservableCollection<Models.Task>>(content) ?? new ObservableCollection<Models.Task>();                  
                     return JsonConvert.DeserializeObject<ObservableCollection<Models.Task>>(content) ?? new ObservableCollection<Models.Task>();
                 }
@@ -149,6 +149,7 @@ namespace Tasky.Database
                 {
                     var payload = new Dictionary<string, dynamic>
                     {
+                        { "TaskId", xt.TaskId },
                         { "TaskName", newName },
                         { "TaskDesc", newDesc },
                         { "HourTask", newDate },
