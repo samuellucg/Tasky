@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using Tasky.Services.Socket;
 using Tasky.ViewModels;
 using Tasky.Views;
 
@@ -49,6 +50,9 @@ namespace Tasky
                 }
             }
 
+            var socket = new SocketClient("http://localhost:3000");
+            // verificar função para else forçar conexão com websocket. ou ir realizando via background em vm
+            await socket.InitializeSocket();
             var mainVm = new MainViewModel();
             var window = new TasksHomePage(mainVm);
             window.Show();
