@@ -22,24 +22,23 @@ namespace Tasky.Database
 {
     public class Database : IDisposable
     {
-        public void Dispose()
-        {
-        }
+        #region Attributes
 
-
-        //public static string fileName = "Database.json";
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
-        public static int size;
+        public static int size; // verificar necessidade
 
         private static HttpClient client;
+        #endregion
 
-
+        #region Constructor
         public Database()
         {
             MapHttp();
-            //WatchDatabase();
         }
+        #endregion
+
+        #region Functions
 
         private void MapHttp()
         {
@@ -54,26 +53,6 @@ namespace Tasky.Database
                 logger.Error(ex);
             }
         }
-
-        //private void WatchDatabase()
-        //{
-        //    if (!File.Exists(fileName))
-        //    {
-        //        File.WriteAllText(fileName, "[]");
-        //    }
-
-        //    ReadJson();
-        //}
-
-        //private void ReadJson()
-        //{
-        //    if (File.Exists(fileName) && File.ReadAllLines(fileName).Length <= 2)
-        //    {
-        //        //DateTime data = string.Format("{0}/{1}/{2}", DateTime.Now.Day, DateTime.Now.Month, DateTime.Now.Year);
-        //        Models.Task toCreate = new Models.Task("Estudar", false, "Estudar programação", DateTime.Now.Date);
-        //        CreateTask(toCreate);
-        //    }
-        //}
 
         public async Task<bool> CreateTask(Models.Task task)
         {
@@ -130,13 +109,6 @@ namespace Tasky.Database
                 return null;
             }
         }
-
-        //public void SaveAll(ObservableCollection<Models.Task> tasks)
-        //{
-        //    var content = JsonConvert.SerializeObject(tasks, Formatting.Indented);
-        //    File.WriteAllText(fileName, content);
-        //    GetAllTasks();
-        //}
 
         public async void UpdateTask(string oldDesc, string oldName, string newDesc, string newName, DateTime newDate, DateTime oldDate, bool? oldNotifyTask, bool newNotifyTask, bool oldTaskDone = false, bool newTaskDone = false)
         {
@@ -209,5 +181,12 @@ namespace Tasky.Database
                 return false;
             }
         }
+        #endregion
+
+        #region Dispose
+        public void Dispose()
+        {
+        }
+        #endregion
     }
 }

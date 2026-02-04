@@ -1,18 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Markup;
 using SocketIOClient;
 using SocketIOClient.Newtonsoft.Json;
 namespace Tasky.Services.Socket
 {
-    public class SocketClient 
+    public static class SocketClient
     {
+        #region Attributes
         private static SocketIOClient.SocketIO _client;
-        public SocketClient(string route)
+        #endregion
+
+        #region Constructor
+        static SocketClient()
         {
-            _client = new SocketIOClient.SocketIO(route, new SocketIOOptions
+            _client = new SocketIOClient.SocketIO("http://localhost:3000", new SocketIOOptions
             {
                 EIO = EngineIO.V4,
                 Reconnection = true,
@@ -21,37 +27,63 @@ namespace Tasky.Services.Socket
             });
 
             _client.JsonSerializer = new NewtonsoftJsonSerializer();
-
-            PopulateRegularEvents();
-            PopulateEvents();
         }
+        #endregion
 
-        public async Task<bool> InitializeSocket()
+        #region Functions
+
+        public static async Task InitializeSocket()
         {
             await _client.ConnectAsync();
             if (_client.Connected)
             {
                 PopulateRegularEvents();
                 PopulateEvents();
-                return true;
             }
-            return false;
         }
 
-
-
-        private async Task UnitializeSocket()
+        private static async Task<bool> UnitializeSocket()
         {
             await _client.DisconnectAsync();
-        }
+            if (!_client.Connected)
+                return true;
+            return false;
 
-        public async Task EmitEvent(string eventName, params object[] payload)
+        }
+        public static async Task EmitEvent(string eventName, params object[] payload)
         {
             await _client.EmitAsync(eventName, payload);
         }
 
+        public static async Task<string> ListenNewEvent(SocketIOResponse response)
+        {
+            string action = await CheckActionFromServer(response);
+            return action;
+        }
+
+        public static async Task RegisterNewEvent(string eventName)
+        {
+            _client.On(eventName, async (response) =>
+            {
+                await ListenNewEvent(response);
+            });
+        }
+
+        public static async Task<string> CheckActionFromServer(SocketIOResponse response)
+        {
+            try
+            {
+                return response.ToString();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                return string.Empty;
+            }
+        }
+
         // For regular events in SocketIoClient library
-        protected void PopulateRegularEvents()
+        private static void PopulateRegularEvents()
         {
             try
             {
@@ -92,7 +124,7 @@ namespace Tasky.Services.Socket
             }
         }
 
-        protected void PopulateEvents()
+        private static void PopulateEvents()
         {
             // Write your events here...
             _client.On("Message", (response) =>
@@ -101,18 +133,31 @@ namespace Tasky.Services.Socket
                 Console.WriteLine($"Received: {response}");
             });
 
-            _client.On("test", (response) =>
+            _client.On("Task_Created", (response) =>
             {
-                Console.WriteLine("Event: test");
+                Console.WriteLine("Event: Task_Created");
+                Console.WriteLine($"Received: {response}");
+            });
+
+            _client.On("Test", (response) =>
+            {
+                Console.WriteLine("Event: Test");
+                Console.WriteLine($"Received: {response}");
+            });
+
+            _client.On("TestApi", (response) =>
+            {
+                Console.WriteLine("Event: TestApi");
                 Console.WriteLine($"Received: {response}");
             });
 
             // Any event that aren't specified
-            _client.OnAny((name, response) =>
-            {
-                Console.WriteLine($"Event: {name}");
-                Console.WriteLine($"Received: {response}");
-            });            
+            //_client.OnAny((name, response) =>
+            //{
+            //    Console.WriteLine($"Event: {name}");
+            //    Console.WriteLine($"Received: {response}");
+            //});            
         }
+        #endregion
     }
 }

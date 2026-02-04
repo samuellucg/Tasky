@@ -28,16 +28,21 @@ namespace Tasky.Views.Utils
     /// </summary>
     public partial class AddModal : Window
     {
+        #region Attributes
         private MainViewModel _viewModel;
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+        #endregion
 
+        #region Constructor
         public AddModal(MainViewModel actualTasks)
         {
             this.Owner = Application.Current.MainWindow;
             InitializeComponent();
             _viewModel = actualTasks;
         }
+        #endregion
 
+        #region Functions
         private async void SubmitInfo(object sender, RoutedEventArgs e)
         {
             try
@@ -112,5 +117,6 @@ namespace Tasky.Views.Utils
         {
             Close();
         }
+        #endregion
     }
 }

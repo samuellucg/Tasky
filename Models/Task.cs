@@ -10,10 +10,6 @@ namespace Tasky.Models
 {
     public class Task : BaseViewModel
     {
-
-        private MainViewModel _viewModel;
-
-
         #region Properties
 
         private string _taskName;
@@ -203,6 +199,7 @@ namespace Tasky.Models
 
         #endregion
 
+        #region Constructor
         public Task(string taskName, bool notifyTask, string taskDesc, DateTime hourTask)
         {
             TaskName = taskName;
@@ -223,6 +220,7 @@ namespace Tasky.Models
                 Sent5min =  false;
             }
         }
+        #endregion
 
     }
 

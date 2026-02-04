@@ -19,8 +19,11 @@ namespace Tasky.Views.Utils
     /// </summary>
     public partial class MessageConfirmation : Window
     {
+        #region Attributes
         public bool UserResponse { get; private set; }
+        #endregion
 
+        #region Constructor
         public MessageConfirmation(string confirmationText, bool showAttention = true)
         {
             this.Owner = Application.Current.MainWindow;
@@ -29,9 +32,10 @@ namespace Tasky.Views.Utils
             attentionName.Visibility = showAttention == true ? Visibility.Visible : Visibility.Collapsed;
             submitButton.Visibility = showAttention == true ? Visibility.Visible : Visibility.Collapsed;
             cancelButton.Visibility = showAttention == true ? Visibility.Visible : Visibility.Collapsed;
-
         }
+        #endregion
 
+        #region Functions
         private void SubmitConfirmation(object sender, RoutedEventArgs e)
         {
             UserResponse = true;
@@ -42,5 +46,6 @@ namespace Tasky.Views.Utils
             UserResponse = false;
             this.DialogResult = true;
         }
+        #endregion
     }
 }

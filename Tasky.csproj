@@ -147,7 +147,6 @@
     <Compile Include="Services\Socket\SocketClient.cs" />
     <Compile Include="ViewModels\BaseViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
-    <Compile Include="ViewModels\TaskViewModel.cs" />
     <Compile Include="Views\TasksHomePage.xaml.cs">
       <DependentUpon>TasksHomePage.xaml</DependentUpon>
     </Compile>
@@ -212,7 +211,6 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include="bin\Debug\Database.json" />
     <Content Include="NLog.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

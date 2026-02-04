@@ -20,8 +20,11 @@ namespace Tasky.Views.Utils
     /// </summary>
     public partial class MessageWarning : Window
     {
+        #region Attributes
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+        #endregion
 
+        #region Constructor
         public MessageWarning(string message = "Tarefa criada com sucesso!")
         {
             try
@@ -38,6 +41,6 @@ namespace Tasky.Views.Utils
                 logger.Error(ex);
             }
         }
-
+        #endregion
     }
 }

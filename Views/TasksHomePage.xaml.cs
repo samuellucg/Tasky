@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -14,6 +15,7 @@ using System.Windows.Shapes;
 using System.Xml;
 using NLog;
 using Tasky.Models;
+using Tasky.Services.Socket;
 using Tasky.ViewModels;
 using Tasky.Views.Utils;
 
@@ -24,21 +26,25 @@ namespace Tasky.Views
     /// </summary>
     public partial class TasksHomePage : Window
     {
+        #region Attributes
         private MainViewModel _vm;
-
         private string _selectedTaskName;
         private string _selectedTaskDesc;
         private DateTime _selectedTaskDate;
         private bool? _selectedTaskNotify;
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+        #endregion
 
+        #region Constructor
         public TasksHomePage(MainViewModel vm)
         {
             InitializeComponent();
             this.DataContext = vm;
             _vm = vm;
         }
+        #endregion
 
+        #region Functions
         public void AddTask(object sender, RoutedEventArgs e)
         {
             try
@@ -261,5 +267,6 @@ namespace Tasky.Views
                 logger.Error(ex);
             }
         }
+        #endregion
     }
 }

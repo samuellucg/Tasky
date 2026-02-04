@@ -13,8 +13,6 @@ namespace Tasky.ViewModels
     public class MainViewModel : BaseViewModel
     {
         #region Properties
-        public TaskViewModel TaskVM { get; } // Not used
-
         private UserOp UserOp { get; } // Maybe you don't need, just to take the username.
 
         private ObservableCollection<Models.Task> _tasksToShow;
@@ -52,7 +50,6 @@ namespace Tasky.ViewModels
         {
             // Read comments in properties to know better.
 
-            TaskVM = new TaskViewModel(); 
             UserOp = new UserOp();
             DB = new Tasky.Database.Database();
         }

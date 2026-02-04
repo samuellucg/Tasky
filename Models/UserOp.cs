@@ -9,6 +9,9 @@ namespace Tasky.Models
 {
     public class UserOp : BaseViewModel
     {
+
+        // remover??????
+
         private static string UserName = Tasky.Properties.Settings.Default.UserName;
 
         public string Presentation = string.Format("Olá {0},\no que vamos fazer hoje?", UserName);

@@ -18,9 +18,11 @@ namespace Tasky
     /// </summary>
     public partial class App : Application
     {
+        #region Attributes
         private static bool isApiOn = false;
+        #endregion
 
-
+        #region Initialization
         private async void StartUpTasky(object sender, StartupEventArgs e)
         {
             HttpClient isApiOnClient = new HttpClient();
@@ -50,12 +52,11 @@ namespace Tasky
                 }
             }
 
-            var socket = new SocketClient("http://localhost:3000");
-            // verificar função para else forçar conexão com websocket. ou ir realizando via background em vm
-            await socket.InitializeSocket();
+            await SocketClient.InitializeSocket();
             var mainVm = new MainViewModel();
             var window = new TasksHomePage(mainVm);
             window.Show();
         }
+        #endregion
     }
 }
