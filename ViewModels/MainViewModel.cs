@@ -8,6 +8,7 @@ using Tasky.Database;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 using System.Windows;
+using Tasky.Services.Socket;
 namespace Tasky.ViewModels
 {
     public class MainViewModel : BaseViewModel
@@ -34,9 +35,9 @@ namespace Tasky.ViewModels
                     OnPropertyChanged("TasksToShow");
                 }
             }
-        } // Tasks in main page
+        }
 
-        public Tasky.Database.Database DB { get; } // Database in json (change to sql)        
+        public Tasky.Database.Database DB { get; }
 
         public string Presentation
         {
@@ -52,8 +53,25 @@ namespace Tasky.ViewModels
 
             UserOp = new UserOp();
             DB = new Tasky.Database.Database();
+
+            SocketClient.RegisterNewEvent("HasChangedEvent");
+
+            SocketClient.OnActionReceived = (action) =>
+            {
+                if (action.Contains("HasChanged"))                
+                    ReloadTasksToShow();                
+            };
         }
         #endregion
 
+        #region Functions
+        public void ReloadTasksToShow()
+        {
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                TasksToShow = DB.GetAllTasks().Result;
+            });
+        }
+        #endregion
     }
 }

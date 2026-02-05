@@ -15,6 +15,9 @@ namespace Tasky.Services.Socket
         private static SocketIOClient.SocketIO _client;
         #endregion
 
+        #region Events
+        public static Action<string> OnActionReceived;
+        #endregion
         #region Constructor
         static SocketClient()
         {
@@ -55,21 +58,22 @@ namespace Tasky.Services.Socket
             await _client.EmitAsync(eventName, payload);
         }
 
-        public static async Task<string> ListenNewEvent(SocketIOResponse response)
+        public static string ListenNewEvent(SocketIOResponse response)
         {
-            string action = await CheckActionFromServer(response);
+            string action = CheckActionFromServer(response);
             return action;
         }
 
-        public static async Task RegisterNewEvent(string eventName)
+        public static void RegisterNewEvent(string eventName)
         {
-            _client.On(eventName, async (response) =>
+            _client.On(eventName, (response) =>
             {
-                await ListenNewEvent(response);
+                var action = ListenNewEvent(response);
+                OnActionReceived?.Invoke(action);
             });
         }
 
-        public static async Task<string> CheckActionFromServer(SocketIOResponse response)
+        public static string CheckActionFromServer(SocketIOResponse response)
         {
             try
             {
@@ -130,12 +134,6 @@ namespace Tasky.Services.Socket
             _client.On("Message", (response) =>
             {
                 Console.WriteLine("Event: Message");
-                Console.WriteLine($"Received: {response}");
-            });
-
-            _client.On("Task_Created", (response) =>
-            {
-                Console.WriteLine("Event: Task_Created");
                 Console.WriteLine($"Received: {response}");
             });
 
