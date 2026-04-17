@@ -141,7 +141,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Common\Converters\BoolToShow.cs" />
+    <Compile Include="Common\Converters\VisibilityConverters.cs" />
     <Compile Include="Database\Database.cs" />
     <Compile Include="Models\UserOp.cs" />
     <Compile Include="Services\Socket\SocketClient.cs" />

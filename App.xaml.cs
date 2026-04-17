@@ -1,62 +1,66 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Linq;
 using System.Net.Http;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using NLog;
 using Tasky.Services.Socket;
 using Tasky.ViewModels;
 using Tasky.Views;
 
 namespace Tasky
 {
-    /// <summary>
-    /// Interação lógica para App.xaml
-    /// </summary>
     public partial class App : Application
     {
-        #region Attributes
-        private static bool isApiOn = false;
-        #endregion
+        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+        private const string ApiHealthCheckUrl = "http://localhost:3000/tasks/healthcheck";
+        private const int ConnectionRetryDelayMs = 10000;
 
-        #region Initialization
         private async void StartUpTasky(object sender, StartupEventArgs e)
         {
-            HttpClient isApiOnClient = new HttpClient();
-            isApiOnClient.Timeout = TimeSpan.FromSeconds(5);
-
-            while (!isApiOn)
+            using (var httpClient = new HttpClient { Timeout = TimeSpan.FromSeconds(5) })
             {
-                try
+                while (!await IsApiAvailable(httpClient))
                 {
-                    var response = await isApiOnClient.GetAsync("http://localhost:3000/tasks/healthcheck");
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        isApiOn = true;
-                    }
-                    else
-                    {
-                        MessageBox.Show("API ERROR", "Api it's not on, trying to connect in 10 seconds...");
-                        await Task.Delay(10000);
-                    }
-                }
-                catch (Exception)
-                {
-                    Console.WriteLine("\nAPI it's offline, trying again in 10 seconds...");
-                    MessageBox.Show("Api it's not on, trying to connect in 10 seconds...", "API ERROR");
-                    await Task.Delay(10000);
+                    MessageBox.Show(
+                        "API não está disponível. Tentando reconectar em 10 segundos...",
+                        "Erro de Conexão",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Warning);
+                    await Task.Delay(ConnectionRetryDelayMs);
                 }
             }
 
-            await SocketClient.InitializeSocket();
-            var mainVm = new MainViewModel();
-            var window = new TasksHomePage(mainVm);
-            window.Show();
+            try
+            {
+                await SocketClient.InitializeSocket();
+                var mainVm = new MainViewModel();
+                var window = new TasksHomePage(mainVm);
+                window.Show();
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex, "Failed to initialize application");
+                MessageBox.Show(
+                    "Erro ao inicializar aplicação. Verifique os logs.",
+                    "Erro",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+                Shutdown();
+            }
         }
-        #endregion
+
+        private static async Task<bool> IsApiAvailable(HttpClient client)
+        {
+            try
+            {
+                var response = await client.GetAsync(ApiHealthCheckUrl);
+                return response.IsSuccessStatusCode;
+            }
+            catch (Exception ex)
+            {
+                logger.Debug(ex, "API health check failed");
+                return false;
+            }
+        }
     }
 }

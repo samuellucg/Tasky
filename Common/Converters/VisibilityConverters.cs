@@ -36,4 +36,30 @@ namespace Tasky.Common.Converters
             throw new NotImplementedException();
         }
     }
+
+    public class DateTimeToStringConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is DateTime dateTime)
+            {
+                string format = parameter as string ?? "dd/MM/yyyy";
+                return dateTime.ToString(format, new CultureInfo("pt-BR"));
+            }
+            return value;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is string stringValue)
+            {
+                string format = parameter as string ?? "dd/MM/yyyy";
+                if (DateTime.TryParseExact(stringValue, format, new CultureInfo("pt-BR"), DateTimeStyles.None, out DateTime result))
+                {
+                    return result;
+                }
+            }
+            return value;
+        }
+    }
 }

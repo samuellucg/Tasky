@@ -1,27 +1,21 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Markup;
+using NLog;
 using SocketIOClient;
 using SocketIOClient.Newtonsoft.Json;
+
 namespace Tasky.Services.Socket
 {
     public static class SocketClient
     {
-        #region Attributes
+        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
         private static SocketIOClient.SocketIO _client;
-        #endregion
 
-        #region Events
-        public static Action<string> OnActionReceived;
-        #endregion
-        #region Constructor
+        public static event Action<string> OnActionReceived;
+
         static SocketClient()
         {
-            _client = new SocketIOClient.SocketIO("http://localhost:3000", new SocketIOOptions
+            _client = new SocketIOClient.SocketIO("http://localhost:3000", new SocketIOClient.SocketIOOptions
             {
                 EIO = EngineIO.V4,
                 Reconnection = true,
@@ -31,9 +25,6 @@ namespace Tasky.Services.Socket
 
             _client.JsonSerializer = new NewtonsoftJsonSerializer();
         }
-        #endregion
-
-        #region Functions
 
         public static async Task InitializeSocket()
         {
@@ -45,117 +36,61 @@ namespace Tasky.Services.Socket
             }
         }
 
-        private static async Task<bool> UnitializeSocket()
+        public static async Task DisconnectAsync()
         {
             await _client.DisconnectAsync();
-            if (!_client.Connected)
-                return true;
-            return false;
-
         }
+
         public static async Task EmitEvent(string eventName, params object[] payload)
         {
             await _client.EmitAsync(eventName, payload);
         }
 
-        public static string ListenNewEvent(SocketIOResponse response)
-        {
-            string action = CheckActionFromServer(response);
-            return action;
-        }
-
         public static void RegisterNewEvent(string eventName)
         {
-            _client.On(eventName, (response) =>
+            _client.On(eventName, response =>
             {
-                var action = ListenNewEvent(response);
+                var action = response.ToString();
                 OnActionReceived?.Invoke(action);
             });
         }
 
-        public static string CheckActionFromServer(SocketIOResponse response)
-        {
-            try
-            {
-                return response.ToString();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
-                return string.Empty;
-            }
-        }
-
-        // For regular events in SocketIoClient library
         private static void PopulateRegularEvents()
         {
-            try
+            _client.OnConnected += (sender, e) =>
             {
-                _client.OnConnected += async (sender, e) =>
-                {
-                    Console.WriteLine($"Connected to socket! \nID: {_client.Id}");
-                    Console.WriteLine($"Http Client: {_client.HttpClient}");
-                };
+                logger.Info($"Connected to socket! ID: {_client.Id}");
+            };
 
-                _client.OnDisconnected += async (sender, e) =>
-                {
-                    Console.WriteLine("Disconnected to socket!");
-                };
-
-                _client.OnReconnected += async (sender, e) =>
-                {
-                    Console.WriteLine($"Reconnected to socket! \nID:{_client.Id}");
-                };
-
-                _client.OnReconnectAttempt += async (sender, e) =>
-                {
-                    Console.WriteLine($"Trying to reconnect to socket.");
-                };
-
-                _client.OnReconnectError += async (sender, e) =>
-                {
-                    Console.WriteLine($"Error reconnecting to socket");
-                };
-
-                _client.OnReconnectFailed += async (sender, e) =>
-                {
-                    Console.WriteLine($"Failed reconnecting to socket");
-                };
-            }
-            catch (Exception ex)
+            _client.OnDisconnected += (sender, e) =>
             {
-                Console.WriteLine($"Exception on {nameof(PopulateRegularEvents)}: {ex}");
-            }
+                logger.Info("Disconnected from socket");
+            };
+
+            _client.OnReconnected += (sender, e) =>
+            {
+                logger.Info($"Reconnected to socket! ID: {_client.Id}");
+            };
+
+            _client.OnReconnectAttempt += (sender, e) =>
+            {
+                logger.Debug("Attempting to reconnect to socket...");
+            };
+
+            _client.OnReconnectError += (sender, e) =>
+            {
+                logger.Error("Error reconnecting to socket");
+            };
+
+            _client.OnReconnectFailed += (sender, e) =>
+            {
+                logger.Error("Failed to reconnect to socket");
+            };
         }
 
         private static void PopulateEvents()
         {
-            // Write your events here...
-            _client.On("Message", (response) =>
-            {
-                Console.WriteLine("Event: Message");
-                Console.WriteLine($"Received: {response}");
-            });
-
-            _client.On("Test", (response) =>
-            {
-                Console.WriteLine("Event: Test");
-                Console.WriteLine($"Received: {response}");
-            });
-
-            _client.On("TestApi", (response) =>
-            {
-                Console.WriteLine("Event: TestApi");
-                Console.WriteLine($"Received: {response}");
-            });
-
-            // Any event that aren't specified
-            //_client.OnAny((name, response) =>
-            //{
-            //    Console.WriteLine($"Event: {name}");
-            //    Console.WriteLine($"Received: {response}");
-            //});            
+            // Add custom events here
         }
-        #endregion
     }
 }

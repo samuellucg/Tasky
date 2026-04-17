@@ -1,22 +1,23 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Tasky.ViewModels;
 
 namespace Tasky.Models
 {
-    public class UserOp : BaseViewModel
+    public class UserOp
     {
-
-        // remover??????
-
         private static string UserName = Tasky.Properties.Settings.Default.UserName;
 
-        public string Presentation = string.Format("Olá {0},\no que vamos fazer hoje?", UserName);
+        public string Presentation => $"{GetGreeting()}, {UserName}!\nO que vamos fazer hoje?";
 
-        // fazer função que olha a hora do pc, se pra saber se é bom dia,tarde ou noite.
+        private static string GetGreeting()
+        {
+            int hour = DateTime.Now.Hour;
 
+            if (hour >= 5 && hour < 12)
+                return "Bom dia";
+            else if (hour >= 12 && hour < 18)
+                return "Boa tarde";
+            else
+                return "Boa noite";
+        }
     }
 }

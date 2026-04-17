@@ -1,211 +1,80 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Tasky.ViewModels;
 
 namespace Tasky.Models
 {
     public class Task : BaseViewModel
     {
-        #region Properties
-
         private string _taskName;
+        private string _taskDesc;
+        private DateTime _hourTask;
+        private bool _notifyTask;
+        private bool _isEditingTask;
+        private bool _canChange = true;
+        private int _taskId;
+        private bool _taskDone;
+        private Notify _notifications;
 
         public string TaskName
         {
-            get
-            {
-                return _taskName;
-            }
-            set
-            {
-                if (_taskName != value && _canChange)
-                {
-                    _taskName = value;
-                    OnPropertyChanged("TaskName");
-                }
-            }
+            get => _taskName;
+            set => SetProperty(ref _taskName, value);
         }
-
-        private bool _notifyTask;
-
-        public bool NotifyTask
-        {
-            get
-            {
-                return _notifyTask;
-            }
-            set
-            {
-                if (_notifyTask != value)
-                {
-                    _notifyTask = value;
-                    OnPropertyChanged("NotifyTask");
-                }
-            }
-        }
-
-        private string _taskDesc;
 
         public string TaskDesc
         {
-            get
-            {
-                return _taskDesc;
-            }
-            set
-            {
-                if (_taskDesc != value && _canChange)
-                {
-                    _taskDesc = value;
-                    OnPropertyChanged("TaskDesc");
-                }
-            }
+            get => _taskDesc;
+            set => SetProperty(ref _taskDesc, value);
         }
-
-        //private TimeSpan _hourTask;
-
-        //public TimeSpan HourTask
-        //{
-        //    get
-        //    {
-        //        return _hourTask;
-        //    }
-
-        //    set 
-        //    {
-        //       if (_hourTask != value)
-        //       {
-        //           _hourTask = value;
-        //           OnPropertyChanged("HourTask");
-        //       }
-        //    }
-        //}
-
-        private DateTime _hourTask;
 
         public DateTime HourTask
         {
-            get
-            {
-                return _hourTask;
-            }
-
-            set
-            {
-                if (_hourTask != value)
-                {
-                    _hourTask = value;
-                    OnPropertyChanged("HourTask");
-                }
-            }
+            get => _hourTask;
+            set => SetProperty(ref _hourTask, value);
         }
 
-        //private string _hourTask;
-
-        //public string HourTask
-        //{
-        //    get
-        //    {
-        //        return _hourTask;
-        //    }
-
-        //    set
-        //    {
-        //        if (_hourTask != value)
-        //        {
-        //            _hourTask = value;
-        //            OnPropertyChanged("HourTask");
-        //        }
-        //    }
-        //}
-
-        private bool _isEditingTask;
+        public bool NotifyTask
+        {
+            get => _notifyTask;
+            set => SetProperty(ref _notifyTask, value);
+        }
 
         public bool IsEditingTask
         {
             get => _isEditingTask;
-
-            set
-            {
-                if (_isEditingTask != value)
-                {
-                    _isEditingTask = value;
-                    OnPropertyChanged("IsEditingTask");
-                }
-            }
+            set => SetProperty(ref _isEditingTask, value);
         }
-
-        private bool _canChange = true;
 
         public bool CanChange
         {
             get => _canChange;
-            set
-            {
-                if (_canChange != value)
-                {
-                    _canChange = value;
-                }
-            }
+            set => SetProperty(ref _canChange, value);
         }
-
-        private int _taskId;
 
         public int TaskId
         {
             get => _taskId;
-            set
-            {
-                if (_taskId != value)
-                {
-                    _taskId = value;
-                }
-            }
+            set => SetProperty(ref _taskId, value);
         }
-
-        private bool _done = false; // fazer isso ter funcionalidade na tela (tarefa concluida?/não?).
 
         public bool TaskDone
         {
-            get => _done;
-
-            set
-            {
-                if (_done != value)
-                {
-                    _done = value;
-                }
-            }
+            get => _taskDone;
+            set => SetProperty(ref _taskDone, value);
         }
-
-        private Notify _notifications;
 
         public Notify Notifications
         {
             get => _notifications;
-            set
-            {
-                if (_notifications != value)
-                {
-                    _notifications = value;
-                }
-            }
+            set => SetProperty(ref _notifications, value);
         }
 
-
-        #endregion
-
-        #region Constructor
         public Task(string taskName, bool notifyTask, string taskDesc, DateTime hourTask)
         {
             TaskName = taskName;
             TaskDesc = taskDesc;
             NotifyTask = notifyTask;
-            HourTask = hourTask;     
+            HourTask = hourTask;
             Notifications = new Notify();
         }
 
@@ -217,11 +86,8 @@ namespace Tasky.Models
             public Notify()
             {
                 Sent15min = false;
-                Sent5min =  false;
+                Sent5min = false;
             }
         }
-        #endregion
-
     }
-
 }

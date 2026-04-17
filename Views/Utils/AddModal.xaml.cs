@@ -1,21 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using NLog;
 using Tasky.Database;
 using Tasky.Models;
@@ -23,100 +8,101 @@ using Tasky.ViewModels;
 
 namespace Tasky.Views.Utils
 {
-    /// <summary>
-    /// Interação lógica para AddModal.xam
-    /// </summary>
     public partial class AddModal : Window
     {
-        #region Attributes
         private MainViewModel _viewModel;
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
-        #endregion
 
-        #region Constructor
         public AddModal(MainViewModel actualTasks)
         {
-            this.Owner = Application.Current.MainWindow;
+            Owner = Application.Current.MainWindow;
             InitializeComponent();
             _viewModel = actualTasks;
         }
-        #endregion
 
-        #region Functions
         private async void SubmitInfo(object sender, RoutedEventArgs e)
         {
             try
             {
-                var validDate = taskHour.Text == "__:__" ? DateTime.Parse(taskDate.Text) : DateTime.Parse(string.Format("{0} {1}", taskDate.Text, taskHour.Text));
+                var validDate = ParseDateTime(taskDate.Text, taskHour.Text);
                 var actualDate = DateTime.Now;
-                if (taskName.Text.Length > 1 && taskDesc.Text.Length > 1 && validDate > actualDate) // validDate.Year >= actualDate.Year && validDate.Month >= actualDate.Month && validDate.Day >= actualDate.Day && 
+
+                if (string.IsNullOrWhiteSpace(taskName.Text) ||
+                    string.IsNullOrWhiteSpace(taskDesc.Text) ||
+                    taskName.Text.Length <= 1 ||
+                    taskDesc.Text.Length <= 1)
                 {
-                    var taskCreated = new Models.Task(taskName.Text, taskNot.IsChecked.Value, taskDesc.Text, validDate); // fazer campo pra mandar data.
-                    if (taskCreated != null)
+                    ShowWarning("Por favor, preencha todos os campos corretamente.");
+                    return;
+                }
+
+                if (validDate <= actualDate)
+                {
+                    ShowWarning($"A data/hora deve ser posterior a {actualDate:dd/MM/yyyy HH:mm}");
+                    return;
+                }
+
+                var taskCreated = new Models.Task(taskName.Text, taskNot.IsChecked ?? false, taskDesc.Text, validDate);
+
+                var userInput = new MessageConfirmation("Tem certeza que deseja prosseguir?");
+                if (userInput.ShowDialog() == true && userInput.UserResponse)
+                {
+                    using (var DB = new Database.Database())
                     {
-                        MessageConfirmation userInput = new MessageConfirmation("Tem certeza que deseja prosseguir?");
-                        if (!userInput.IsActive)
+                        if (await DB.CreateTask(taskCreated))
                         {
-                            bool? hasShowed = userInput.ShowDialog();
-                            if (hasShowed is true)
-                            {
-                                bool userChoice = userInput.UserResponse;
-
-                                if (userChoice)
-                                {
-                                    using (Tasky.Database.Database DB = new Tasky.Database.Database())
-                                    {
-                                        if (await DB.CreateTask(taskCreated))
-                                            _viewModel.TasksToShow = await DB.GetAllTasks();
-                                        else
-                                            new MessageWarning("Erro ao criar tarefa");
-                                    }
-                                    taskName.Text = taskDesc.Text = null;
-                                    taskNot.IsChecked = false;
-
-                                    new MessageWarning("Operação realizada");
-                                    Close();
-                                }
-                                else
-                                {
-                                    new MessageWarning("Operação abortada");
-                                    //Close();
-                                }
-                            }
+                            _viewModel.TasksToShow = await DB.GetAllTasks();
+                            ShowWarning("Tarefa criada com sucesso!");
+                            ClearFields();
+                            Close();
                         }
                         else
-                            MessageBox.Show("THREAD ERROR");
+                        {
+                            ShowWarning("Erro ao criar tarefa. Verifique a conexão com a API.");
+                        }
                     }
                 }
-
-                else if (validDate < actualDate) // validDate.Year < actualDate.Year || validDate.Month < actualDate.Month || validDate.Day < actualDate.Day
-                {
-                    //new MessageWarning(string.Format("Deve ser salvo para anos\nentre {0} ou mais.", actualDate.Year.ToString()));
-                    new MessageWarning(string.Format("A data/hora deve ser posterior a\n              {0}", actualDate.ToString()));
-                }
-
-                else
-                {
-                    new MessageWarning("Erro ao salvar");
-                    //Close();
-                }
             }
-            catch (System.FormatException)
+            catch (FormatException)
             {
-                new MessageWarning("Data inválida, insira novamente.");
-                //Close();
+                ShowWarning("Data inválida. Use o formato DD/MM/AAAA HH:mm");
             }
             catch (Exception ex)
             {
                 logger.Error(ex);
+                ShowWarning("Erro inesperado. Consulte os logs.");
             }
+        }
 
+        private DateTime ParseDateTime(string dateText, string hourText)
+        {
+            if (string.IsNullOrWhiteSpace(dateText) || dateText.Contains("_"))
+                throw new FormatException("Data incompleta");
+
+            if (hourText == "__:__" || string.IsNullOrWhiteSpace(hourText) || hourText.Contains("_"))
+                return DateTime.Parse(dateText);
+
+            return DateTime.Parse($"{dateText} {hourText}");
+        }
+
+        private void ClearFields()
+        {
+            taskName.Clear();
+            taskDesc.Clear();
+            taskDate.Clear();
+            taskHour.Clear();
+            taskNot.IsChecked = false;
+        }
+
+        private static void ShowWarning(string message)
+        {
+            var warning = new MessageWarning(message);
+            warning.ShowDialog();
         }
 
         private void CloseModal(object sender, RoutedEventArgs e)
         {
             Close();
         }
-        #endregion
     }
 }

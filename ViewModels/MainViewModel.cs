@@ -1,77 +1,59 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.ObjectModel;
 using System.Threading.Tasks;
-using Tasky.Models;
-using Tasky.Database;
-using System.Collections.ObjectModel;
-using System.Windows.Input;
 using System.Windows;
+using Tasky.Database;
+using Tasky.Models;
 using Tasky.Services.Socket;
+
 namespace Tasky.ViewModels
 {
     public class MainViewModel : BaseViewModel
     {
-        #region Properties
-        private UserOp UserOp { get; } // Maybe you don't need, just to take the username.
-
+        private readonly UserOp _userOp;
         private ObservableCollection<Models.Task> _tasksToShow;
 
         public ObservableCollection<Models.Task> TasksToShow
         {
-
-            get
-            {
-                _tasksToShow = DB.GetAllTasks().Result;
-                return _tasksToShow;
-            }
-
-            set
-            {
-                if (value != _tasksToShow)
-                {
-                    _tasksToShow = value;
-                    OnPropertyChanged("TasksToShow");
-                }
-            }
+            get => _tasksToShow;
+            set => SetProperty(ref _tasksToShow, value);
         }
 
-        public Tasky.Database.Database DB { get; }
+        public Database.Database DB { get; }
 
-        public string Presentation
-        {
-            get => UserOp.Presentation;
-        }
+        public string Presentation => _userOp.Presentation;
 
-        #endregion
-
-        #region CTOR
         public MainViewModel()
         {
-            // Read comments in properties to know better.
-
-            UserOp = new UserOp();
-            DB = new Tasky.Database.Database();
+            _userOp = new UserOp();
+            DB = new Database.Database();
 
             SocketClient.RegisterNewEvent("HasChangedEvent");
+            SocketClient.OnActionReceived += OnSocketActionReceived;
 
-            SocketClient.OnActionReceived = (action) =>
-            {
-                if (action.Contains("HasChanged"))                
-                    ReloadTasksToShow();                
-            };
+            _ = LoadTasksAsync();
         }
-        #endregion
 
-        #region Functions
-        public void ReloadTasksToShow()
+        private void OnSocketActionReceived(string action)
         {
+            if (action?.Contains("HasChanged") == true)
+                ReloadTasksToShow();
+        }
+
+        public async System.Threading.Tasks.Task LoadTasksAsync()
+        {
+            var tasks = await DB.GetAllTasks();
             Application.Current.Dispatcher.Invoke(() =>
             {
-                TasksToShow = DB.GetAllTasks().Result;
+                TasksToShow = tasks ?? new ObservableCollection<Models.Task>();
             });
         }
-        #endregion
+
+        public void ReloadTasksToShow()
+        {
+            Application.Current.Dispatcher.Invoke(async () =>
+            {
+                TasksToShow = await DB.GetAllTasks() ?? new ObservableCollection<Models.Task>();
+            });
+        }
     }
 }

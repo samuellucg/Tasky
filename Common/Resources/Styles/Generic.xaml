@@ -82,16 +82,16 @@
 
 
 
-    <BitmapImage x:Key="CloseButton" UriSource="C:\Users\Pichau\source\repos\Tasky\Common\Resources\Images\CloseButton.png" 
+    <BitmapImage x:Key="CloseButton" UriSource="pack://application:,,,/Common/Resources/Images/CloseButton.png"
                  RenderOptions.BitmapScalingMode="HighQuality"/>
 
-    <BitmapImage x:Key="AddButton" UriSource="C:\Users\Pichau\source\repos\Tasky\Common\Resources\Images\AddButton.png" 
+    <BitmapImage x:Key="AddButton" UriSource="pack://application:,,,/Common/Resources/Images/AddButton.png"
                  RenderOptions.BitmapScalingMode="HighQuality"/>
 
-    <BitmapImage x:Key="EditButton" UriSource="C:\Users\Pichau\source\repos\Tasky\Common\Resources\Images\EditButton.png" 
+    <BitmapImage x:Key="EditButton" UriSource="pack://application:,,,/Common/Resources/Images/EditButton.png"
                  RenderOptions.BitmapScalingMode="HighQuality"/>
 
-    <BitmapImage x:Key="DeleteButton" UriSource="C:\Users\Pichau\source\repos\Tasky\Common\Resources\Images\DeleteButton.png" 
+    <BitmapImage x:Key="DeleteButton" UriSource="pack://application:,,,/Common/Resources/Images/DeleteButton.png"
                  RenderOptions.BitmapScalingMode="HighQuality"/>
 
 

@@ -46,7 +46,7 @@ namespace Tasky.Database
             {
 
                 client = new HttpClient();
-                client.BaseAddress = new Uri("http://localhost:3000/tasks");
+                client.BaseAddress = new Uri("http://localhost:3000/");
             }
             catch (Exception ex)
             {
@@ -58,11 +58,16 @@ namespace Tasky.Database
         {
             try
             {
-                size += 1;
-                task.TaskId = size;
-                var content = new StringContent(JsonConvert.SerializeObject(task), Encoding.UTF8, "application/json");
-                var response = await client.PostAsync(client.BaseAddress, content).ConfigureAwait(false);
-                if (response.EnsureSuccessStatusCode().StatusCode == System.Net.HttpStatusCode.OK)
+                //size += 1;
+                //task.TaskId = size;
+                var payload = new
+                {
+                    chatId = 1,
+                    body = task
+                };
+                var content = new StringContent(JsonConvert.SerializeObject(payload), Encoding.UTF8, "application/json");
+                var response = await client.PostAsync("tasks/", content).ConfigureAwait(false);
+                if (response.EnsureSuccessStatusCode().StatusCode == System.Net.HttpStatusCode.Created)
                 {
                     return true;
                 }
@@ -86,12 +91,11 @@ namespace Tasky.Database
         {
             try
             {
-                var response = await client.GetAsync(client.BaseAddress).ConfigureAwait(false);
+                var response = await client.GetAsync("tasks/from-user?userId=1").ConfigureAwait(false);
                 if (response.EnsureSuccessStatusCode().StatusCode == System.Net.HttpStatusCode.OK)
                 {
                     var content = await response.Content.ReadAsStringAsync();
                     size = JsonConvert.DeserializeObject<ObservableCollection<Models.Task>>(content).OrderBy(x => x.TaskId).Select(x => x.TaskId).Last();
-                    //return JsonConvert.DeserializeObject<ObservableCollection<Models.Task>>(content) ?? new ObservableCollection<Models.Task>();                  
                     return JsonConvert.DeserializeObject<ObservableCollection<Models.Task>>(content) ?? new ObservableCollection<Models.Task>();
                 }
                 throw new Exception();
@@ -110,37 +114,25 @@ namespace Tasky.Database
             }
         }
 
-        public async void UpdateTask(string oldDesc, string oldName, string newDesc, string newName, DateTime newDate, DateTime oldDate, bool? oldNotifyTask, bool newNotifyTask, bool oldTaskDone = false, bool newTaskDone = false)
+        public async Task<bool> UpdateTask(int taskId, string newName, string newDesc, DateTime newDate, bool newNotifyTask, bool newTaskDone)
         {
             try
             {
-                var tasks = await GetAllTasks();
-                var xt = tasks.FirstOrDefault(x => x.TaskName == oldName && x.TaskDesc == oldDesc && x.HourTask == oldDate && x.NotifyTask == oldNotifyTask);
-
-                if (xt != null)
+                var payload = new Dictionary<string, dynamic>
                 {
-                    var payload = new Dictionary<string, dynamic>
-                    {
-                        { "TaskId", xt.TaskId },
-                        { "TaskName", newName },
-                        { "TaskDesc", newDesc },
-                        { "HourTask", newDate },
-                        { "TaskDone", newTaskDone },
-                        { "NotifyTask", newNotifyTask},
-                    };
-                    var content = new StringContent(JsonConvert.SerializeObject(payload), Encoding.UTF8, "application/json");
-                    var response = await client.PutAsync($"{client.BaseAddress}?taskId={xt.TaskId}", content).ConfigureAwait(false);
-                    Console.WriteLine(response.StatusCode);
-                    response.EnsureSuccessStatusCode();
-                }
-                else
-                {
-                    //MessageBox.Show("Error");
-                }
-
+                    { "chatId", 1 },
+                    { "TaskId", taskId },
+                    { "TaskName", newName },
+                    { "TaskDesc", newDesc },
+                    { "HourTask", newDate },
+                    { "TaskDone", newTaskDone },
+                    { "NotifyTask", newNotifyTask},
+                };
+                var content = new StringContent(JsonConvert.SerializeObject(payload), Encoding.UTF8, "application/json");
+                var response = await client.PutAsync("tasks/", content).ConfigureAwait(false);
+                Console.WriteLine(response.StatusCode);
+                return response.IsSuccessStatusCode;
             }
-
-#if RELEASE
             catch (Exception ex) when (ex is HttpRequestException || ex is SocketException || ex is WebException)
             {
                 MessageBox.Show("Application gonna restart");
@@ -148,10 +140,10 @@ namespace Tasky.Database
                 Environment.Exit(0);
                 throw;
             }
-#endif
             catch (Exception ex)
             {
                 logger.Error(ex);
+                return false;
             }
         }
 
@@ -159,8 +151,7 @@ namespace Tasky.Database
         {
             try
             {
-                var content = new StringContent(JsonConvert.SerializeObject(taskToDelete), Encoding.UTF8, "application/json");
-                var response = await client.DeleteAsync($"{client.BaseAddress}?taskId={taskToDelete.TaskId}").ConfigureAwait(false);
+                var response = await client.DeleteAsync($"tasks/{taskToDelete.TaskId}?userId=1").ConfigureAwait(false);
                 if (response.EnsureSuccessStatusCode().StatusCode == System.Net.HttpStatusCode.OK)
                 {
                     //client.Dispose();
