@@ -42,7 +42,7 @@ O **Tasky** é uma aplicação desktop que serve como **visualização estendida
 
 ### Repos relacionados
 
-- 🔗 **API-TASKY** — Backend Node.js com PostgreSQL: [https://github.com/samuellucg/API-Tasky]
+- 🔗 **[API-Tasky](https://github.com/samuellucg/API-Tasky)** — back-end Node.js com PostgreSQL, Redis e bot do Telegram
 - 🤖 **Bot Telegram** — Gerenciamento via chat (integrado no repo acima)
 
 ---
@@ -132,7 +132,7 @@ msbuild Tasky.sln
 
 ## 💡 Aprendizados & Evolução
 
-Este projeto foi desenvolvido como **exercício de aprendizado** em C# e WPF. Aprendi na prática sobre:
+Decisões técnicas e desafios enfrentados na construção:
 
 - Threading em WPF (`Dispatcher.Invoke` para updates de UI)
 - Async/await patterns em aplicações desktop
@@ -145,7 +145,3 @@ Este projeto foi desenvolvido como **exercício de aprendizado** em C# e WPF. Ap
 - **Configuração externa** — URLs hardcoded poderiam vir de appsettings
 - **Testes unitários** — interfaces facilitariam mocks
 - **Separação de concerns** — Database.cs mistura HTTP com lógica de restart
-
----
-
-> **Nota:** Projeto de aprendizado. A arquitetura evoluiu durante o desenvolvimento e reflete minha jornada de aprendizado em C#, WPF e comunicação real-time.
