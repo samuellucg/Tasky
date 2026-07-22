@@ -107,7 +107,7 @@ Tasky/
 
 ```bash
 # Clone o repositório
-git clone https://github.com/seu-usuario/Tasky.git
+git clone https://github.com/samuellucg/Tasky.git
 
 # Restore packages (NuGet)
 nuget restore Tasky.sln
